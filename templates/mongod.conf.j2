@@ -1,0 +1,39 @@
+# {{ ansible_managed }}
+
+net:
+  bindIp: {{ mongodb_conf_bind_ip }}
+  http:
+    enabled: {{ mongodb_conf_httpinterface|to_nice_json|bool|lower }}
+  ipv6: {{ mongodb_conf_ipv6|to_nice_json|bool|lower }}
+  maxIncomingConnections: {{ mongodb_conf_maxConns|int }}
+  port: {{ mongodb_conf_port|int }}
+
+processManagement:
+  fork: true
+  pidFilePath: {{ mongodb_conf_pidpath }}
+
+{% if mongodb_conf_replset -%}
+replication:
+  oplogSizeMB: {{ mongodb_conf_oplogsize | int }}
+  replSetName: {{ mongodb_conf_replset }}
+{% endif %}
+
+security:
+  {% if mongodb_conf_auth -%}
+  authorization: {{ mongodb_conf_auth }}
+{% endif %}
+  {% if mongodb_conf_replset and mongodb_conf_auth == 'enabled' -%}
+  keyFile: {{ mongodb_conf_keyfile }}
+{% endif %}
+
+storage:
+  dbPath: {{ mongodb_conf_dbpath }}
+  engine: {{ mongodb_conf_dbengine }}
+  journal:
+    enabled: {{ mongodb_conf_journal|to_nice_json|bool|lower }}
+
+systemLog:
+  destination: file
+  logAppend: {{ mongodb_conf_logappend|to_nice_json|bool|lower }}
+  path: {{ mongodb_conf_logpath }}
+

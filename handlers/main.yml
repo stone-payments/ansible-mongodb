@@ -1,0 +1,19 @@
+---
+- name: sysctl reload
+  shell: sysctl --system
+
+- name: reload systemd
+  shell: systemctl daemon-reload
+
+- name: mongodb reload
+  service: name={{ mongodb_daemon_name }} state=reloaded
+
+- name: mongodb restart
+  service: name={{ mongodb_daemon_name }} state=restarted
+
+- name: mongodb_settings restart
+  service: name=mongodb_settings state=restarted
+
+- name: mongodb-mms-automation-agent restart
+  service: name=mongodb-mms-automation-agent state=restarted
+

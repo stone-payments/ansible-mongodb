@@ -1,0 +1,57 @@
+---
+mongodb_version: "3.2.11"                        # Fully specified target installation version
+mongodb_enabled: yes
+mongodb_install: yes
+mongodb_additional_packages:
+- python-selinux
+- python-pymongo
+
+mongodb_user: mongodb
+mongodb_group: mongodb
+mongodb_logdir: /var/log/mongodb
+mongodb_conf_file: /etc/mongod.conf
+mongodb_conf_keyfile: /etc/mongod.key
+
+# Config options
+mongodb_conf_auth: disabled
+mongodb_conf_bind_ip: 127.0.0.1                   # Comma separated list of ip addresses to listen on
+mongodb_conf_cpu: yes                             # Periodically show cpu and iowait utilization
+mongodb_conf_dbpath: /var/lib/mongo               # Directory for datafiles
+mongodb_conf_dbengine: wiredTiger                 # Storage Engine
+mongodb_conf_pidpath: /var/run/mongodb/mongod.pid # PID file path
+mongodb_conf_fork: no                             # Fork server process
+mongodb_conf_httpinterface: no                    # Enable http interface
+mongodb_conf_ipv6: no                             # Enable IPv6 support (disabled by default)
+mongodb_conf_journal: no                          # Enable journaling
+mongodb_conf_logappend: yes                       # Append to logpath instead of over-writing
+mongodb_conf_logpath: "{{mongodb_logdir}}/mongod.log"  # Log file to send write to instead of stdout
+mongodb_conf_maxConns: 800                        # Max number of simultaneous connections
+mongodb_conf_port: 27017                          # Specify port number
+mongodb_conf_syslog: no                           # Log to system's syslog facility instead of file (ignored if logpath set)
+
+# Replica set options:
+mongodb_conf_replSet:                             # Enable replication <setname>[/<optionalseedhostlist>]
+mongodb_conf_oplogsize: 1024
+
+mongodb_shell: {}                                 # Define mongo shell commands to run
+                                                  # Syntax: mongodb_shell:
+                                                  #          dbname:
+                                                  #           - db.setProfilingLevel(1, 50)
+
+
+# MMS Agent
+mongodb_mms_agent_pkg: ""
+mongodb_mms_group_id: ""
+mongodb_mms_api_key: ""
+mongodb_mms_base_url: https://mms.mongodb.com
+
+# Log rotation
+mongodb_logrotate: yes                             # Rotate mongodb logs.
+mongodb_logrotate_options:
+  - compress
+  - copytruncate
+  - daily
+  - dateext
+  - rotate 7
+  - size 10M
+

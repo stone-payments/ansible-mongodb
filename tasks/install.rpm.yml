@@ -1,0 +1,32 @@
+---
+- name: Install MongoDB repo
+  yum_repository:
+    name: mongodb
+    description: "MongoDB Repo"
+    baseurl: "https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/3.2/x86_64/"
+    gpgcheck: true
+    state: present
+
+- name: Install MongoDB package
+  yum: name={{item}} state=present
+  with_items:
+    - mongodb-org
+    - mongodb-org-server
+    - numactl
+    - python-pymongo
+
+- name: Remove old broken sysV script
+  file:
+    path: "/etc/rc.d/init.d/mongod"
+    state: absent
+  notify: reload systemd
+
+- name: Copy new systemd service file
+  copy:
+    src: mongodb.service
+    dest: /etc/systemd/system/mongodb.service
+    mode: 0644
+  notify: reload systemd
+
+- meta: flush_handlers
+
