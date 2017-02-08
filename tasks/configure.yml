@@ -1,43 +1,71 @@
 ---
+- name: configure mongodb group
+  group:
+    name: "{{ mongodb_daemon.user }}"
+    state: present
 
-- name: Configure mongodb
+- name: configure mongodb user
+  user:
+    name: "{{ mongodb_daemon.user }}"
+    group: "{{ mongodb_daemon.group }}"
+    state: present
+
+- name: configure mongodb-writable directories
+  file:
+    state: directory
+    path: "{{ item.path }}"
+    owner: "{{ mongodb_daemon.user }}"
+    group: "{{ mongodb_daemon.group }}"
+    mode: "0755"
+    recurse: true
+  with_items:
+    - path: "{{ mongodb_conf.dbPath }}"
+    - path: "{{ mongodb_conf.logFile | dirname }}"
+    - path: "{{ mongodb_conf.pidFile | dirname }}"
+  notify: mongodb restart
+
+- name: configure mongodb read-only directories
+  file:
+    state: directory
+    path: "{{ mongodb_conf.file | dirname }}"
+    owner: root
+    group: root
+    mode: "0755"
+  with_items:
+    - path: "{{ mongodb_conf.file | dirname }}"
+    - path: "{{ mongodb_conf.keyFile | dirname }}"
+  notify: mongodb restart
+
+- name: configure mongodb log rotation
+  template:
+    src: logrotate.conf.j2
+    dest: "{{ mongodb_logRotate.file }}"
+  when: mongodb_logRotate.enabled
+
+- name: configure mongodb replication key
+  template:
+    src: "mongod.key.j2"
+    dest: "{{ mongodb_conf.keyFile }}"
+    owner: root
+    group: "{{ mongodb_daemon.group }}"
+    mode: "0640"
+  when: mongodb_conf.auth
+  notify: mongodb restart
+
+- name: configure mongodb daemon
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    owner: "{{ item.user }}"
-    group: "{{ mongodb_group }}"
-    mode: "{{ item.mode }}"
+    owner: root
+    group: root
+    mode: "0644"
   with_items:
-    - src: "mongod.conf.j2"
-      dest: "{{ mongodb_conf_file }}"
-      user: "root"
-      mode: "0644"
-    - src: "mongod.key.j2"
-      dest: "{{ mongodb_conf_keyfile }}"
-      user: "{{ mongodb_user }}"
-      mode: "0400"
-  notify: mongodb restart
+    - src: mongod.conf.j2
+      dest: "{{ mongodb_conf.file }}"
+    - src: mongod.service.j2
+      dest: "{{ mongodb_daemon.serviceFile }}"
+  notify:
+    - systemd reload
+    - mongodb restart
 
-- name: Configure log rotation
-  template: src=logrotate.conf.j2 dest=/etc/logrotate.d/mongodb.conf
-  when: mongodb_logrotate
-
-- name: Create mongodb user
-  user: name={{mongodb_user}} group={{mongodb_user}}
-
-- name: Configure database directory
-  file: state=directory path={{ mongodb_conf_dbpath }} owner={{mongodb_user}} group={{mongodb_user}} mode=0755
-
-- name: Configure log directory
-  file: state=directory path={{ mongodb_conf_logpath | dirname }} owner={{mongodb_user}} group={{mongodb_user}} mode=0755
-
-- name: Ensure mongodb is started
-  service: name={{ mongodb_daemon_name }} state=started enabled=yes
-
-- name: Flush handlers to restart mongodb if necessary
-  meta: flush_handlers
-
-- name: Run mongoshell commands
-  command: mongo {{ item.key }} --eval "{{ item.value|join(';') }}"
-  with_dict: "{{mongodb_shell}}"
-
+- meta: flush_handlers

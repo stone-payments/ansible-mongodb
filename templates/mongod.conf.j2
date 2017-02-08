@@ -1,39 +1,39 @@
+# /etc/mongod.conf
 # {{ ansible_managed }}
 
 net:
-  bindIp: {{ mongodb_conf_bind_ip }}
+  bindIp: {{ mongodb_conf.bindIp }}
   http:
-    enabled: {{ mongodb_conf_httpinterface|to_nice_json|bool|lower }}
-  ipv6: {{ mongodb_conf_ipv6|to_nice_json|bool|lower }}
-  maxIncomingConnections: {{ mongodb_conf_maxConns|int }}
-  port: {{ mongodb_conf_port|int }}
+    enabled: {{ mongodb_conf.httpInterface|to_nice_json|bool|lower }}
+  ipv6: {{ mongodb_conf.ipv6|to_nice_json|bool|lower }}
+  maxIncomingConnections: {{ mongodb_conf.maxConns|int }}
+  port: {{ mongodb_conf.port|int }}
 
 processManagement:
   fork: true
-  pidFilePath: {{ mongodb_conf_pidpath }}
+  pidFilePath: {{ mongodb_conf.pidFile }}
 
-{% if mongodb_conf_replset -%}
+{% if mongodb_conf.replSet -%}
 replication:
-  oplogSizeMB: {{ mongodb_conf_oplogsize | int }}
-  replSetName: {{ mongodb_conf_replset }}
+  oplogSizeMB: {{ mongodb_conf.oplogSize | int }}
+  replSetName: {{ mongodb_conf.replSet }}
 {% endif %}
 
+{% if mongodb_conf.auth -%}
 security:
-  {% if mongodb_conf_auth -%}
-  authorization: {{ mongodb_conf_auth }}
-{% endif %}
-  {% if mongodb_conf_replset and mongodb_conf_auth == 'enabled' -%}
-  keyFile: {{ mongodb_conf_keyfile }}
+  authorization: {{ mongodb_conf.auth }}
+  {% if mongodb_conf.replSet and mongodb_conf.auth -%}
+  keyFile: {{ mongodb_conf.keyFile }}
+  {% endif %}
 {% endif %}
 
 storage:
-  dbPath: {{ mongodb_conf_dbpath }}
-  engine: {{ mongodb_conf_dbengine }}
+  dbPath: {{ mongodb_conf.dbPath }}
+  engine: {{ mongodb_conf.dbEngine }}
   journal:
-    enabled: {{ mongodb_conf_journal|to_nice_json|bool|lower }}
+    enabled: {{ mongodb_conf.journal|to_nice_json|bool|lower }}
 
 systemLog:
   destination: file
-  logAppend: {{ mongodb_conf_logappend|to_nice_json|bool|lower }}
-  path: {{ mongodb_conf_logpath }}
-
+  logAppend: {{ mongodb_conf.logAppend|to_nice_json|bool|lower }}
+  path: {{ mongodb_conf.logFile }}

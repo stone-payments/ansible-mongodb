@@ -1,0 +1,22 @@
+# /etc/systemd/system/mongod.service
+# {{ ansible_managed }}
+[Unit]
+Description=MongoDB Database Service
+Wants=network.target nohugepages.service
+After=network.target
+
+[Service]
+Type=forking
+RuntimeDirectory=mongod
+PIDFile={{ mongodb_conf.pidFile }}
+ExecStart={{ mongodb_daemon.bin }} --config {{ mongodb_conf.file }}
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+User={{ mongodb_daemon.user }}
+Group={{ mongodb_daemon.group }}
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
+Alias=mongo.service mongodb.service mongodb-server.service mongodb-org.service mongodb-org-server.service

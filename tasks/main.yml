@@ -1,5 +1,18 @@
 ---
+- include: install.rpm.yml
+  when: ansible_os_family == 'RedHat' and mongodb_install
 
-- include: mongodb.yml
-  when: mongodb_enabled
-  tags: [mongodb]
+- include: configure.yml
+
+- meta: flush_handlers
+
+- name: ensure mongodb is started
+  service:
+    name: mongod
+    state: started
+    enabled: true
+
+- name: run mongoshell commands
+  command: mongo {{ item.key }} --eval "{{ item.value|join(';') }}"
+  with_dict: "{{ mongodb_shell.commands }}"
+  when: mongodb_shell.run
