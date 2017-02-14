@@ -22,21 +22,21 @@
 - name: install MongoDB RPM GPG key
   rpm_key:
     state: present
-    key: "https://www.mongodb.org/static/pgp/server-{{ mongodb_install.major }}.{{ mongodb_install.minor }}.asc"
+    key: "https://www.mongodb.org/static/pgp/server-{{ mongodb_install_major }}.{{ mongodb_install_minor }}.asc"
 
 - name: install MongoDB repo
   yum_repository:
     name: mongodb
     description: "MongoDB Repo"
-    baseurl: "https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/{{ mongodb_install.major }}.{{ mongodb_install.minor }}/$basearch/"
+    baseurl: "https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/{{ mongodb_install_major }}.{{ mongodb_install_minor }}/$basearch/"
     gpgcheck: true
     state: present
 
 - name: install MongoDB package
   yum: name={{item}} state=present
   with_items:
-    - mongodb-org-{{mongodb_install.major}}.{{mongodb_install.minor}}.{{mongodb_install.patch}}
-    - mongodb-org-server-{{mongodb_install.major}}.{{mongodb_install.minor}}.{{mongodb_install.patch}}
+    - mongodb-org-{{mongodb_install_major}}.{{mongodb_install_minor}}.{{mongodb_install_patch}}
+    - mongodb-org-server-{{mongodb_install_major}}.{{mongodb_install_minor}}.{{mongodb_install_patch}}
     - numactl
     - python-pymongo
 
@@ -53,19 +53,19 @@
     reload: true
     state: present
   with_items:
-    - target: "{{ mongodb_daemon.bin }}"
+    - target: "{{ mongodb_daemon_bin }}"
       setype: mongod_exec_t
-    - target: "{{ mongodb_conf.dbPath | dirname }}(/.*)?"
+    - target: "{{ mongodb_conf_dbPath | dirname }}(/.*)?"
       setype: mongod_var_lib_t
-    - target: "{{ mongodb_conf.logFile | dirname }}(/.*)?"
+    - target: "{{ mongodb_conf_logFile | dirname }}(/.*)?"
       setype: mongod_log_t
-    - target: "{{ mongodb_conf.pidFile | dirname }}(/.*)?"
+    - target: "{{ mongodb_conf_pidFile | dirname }}(/.*)?"
       setype: mongod_var_run_t
   notify: mongodb restart
 
 - name: configure SELinux network ports for mongodb
   seport:
-    ports: "{{ mongodb_conf.port }}"
+    ports: "{{ mongodb_conf_port }}"
     proto: tcp
     setype: mongod_port_t
     reload: true

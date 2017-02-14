@@ -2,8 +2,8 @@
 # Do NOT modify this file by hand!
 # {{ ansible_managed }}
 
-{{ mongodb_conf.logFile }} {
-{% for option in mongodb_logRotate.options %}
+{{ mongodb_conf_logFile }} {
+{% for option in mongodb_logRotate_options %}
     {{ option }}
 {% endfor %}
 }

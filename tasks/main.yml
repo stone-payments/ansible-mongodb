@@ -1,10 +1,15 @@
 ---
-- include: install.rpm.yml
-  when: ansible_os_family == 'RedHat' and mongodb_install
+- block:
+  - name: install MongoDB (RedHat)
+    include: install.rpm.yml
+    when: ansible_os_family == 'RedHat'
+  when: mongodb_install_enabled
 
-- include: configure.yml
+- name: configure MongoDB daemon
+  include: configure.yml
 
-- meta: flush_handlers
+  #- name: configure MongoDB replication
+  #  include: configure.yml
 
 - name: ensure mongodb is started
   service:
@@ -14,5 +19,5 @@
 
 - name: run mongoshell commands
   command: mongo {{ item.key }} --eval "{{ item.value|join(';') }}"
-  with_dict: "{{ mongodb_shell.commands }}"
+  with_dict: "{{ mongodb_shell_commands }}"
   when: mongodb_shell.run
