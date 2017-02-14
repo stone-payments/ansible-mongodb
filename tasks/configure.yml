@@ -17,7 +17,6 @@
     owner: "{{ mongodb_daemon_user }}"
     group: "{{ mongodb_daemon_group }}"
     mode: "0755"
-    recurse: true
   with_items:
     - path: "{{ mongodb_conf_dbPath }}"
     - path: "{{ mongodb_conf_logFile | dirname }}"
