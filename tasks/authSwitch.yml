@@ -1,0 +1,17 @@
+---
+- name: stop mongodb instance
+  service:
+    name: mongod
+    state: stopped
+
+- name: generate config with auth {{ mongodb_authSwitch }}
+  template:
+    src: mongod.conf.j2
+    dest: "{{ mongodb_conf_file }}"
+  vars:
+      - mongodb_conf_auth: "{{ mongodb_authSwitch }}"
+
+- name: start mongodb instance
+  service:
+    name: mongod
+    state: started

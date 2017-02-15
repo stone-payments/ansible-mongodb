@@ -1,0 +1,52 @@
+---
+- name: ensure admin login works with password
+  mongodb_user:
+    database: admin
+    login_user: "{{ mongodb_admin_user }}"
+    login_password: "{{ mongodb_admin_password }}"
+    user: "{{ mongodb_admin_user }}"
+    password: "{{ mongodb_admin_password }}"
+    roles:
+      - db: admin
+        role: root
+    state: present
+  ignore_errors: true
+  when: mongodb_conf_auth == true
+  register: mongodb_login_withPass
+
+- name: ensure admin login works without password
+  mongodb_user:
+    database: admin
+    user: "{{ mongodb_admin_user }}"
+    password: "{{ mongodb_admin_password }}"
+    roles:
+      - db: admin
+        role: root
+    state: present
+  ignore_errors: true
+  when: mongodb_conf_auth == false
+  register: mongodb_login_withoutPass
+
+- block:
+  - name: switch auth to disabled
+    include: authSwitch.yml
+    vars:
+      - mongodb_authSwitch: false
+    when: mongodb_login_withPass|failed
+
+  - name: configure mongodb admin user and password
+    mongodb_user:
+      database: admin
+      user: "{{ mongodb_admin_user }}"
+      password: "{{ mongodb_admin_password }}"
+      roles:
+        - db: admin
+          role: root
+      state: present
+
+  - name: switch auth to desired value
+    include: authSwitch.yml
+    vars:
+      - mongodb_authSwitch: true
+    when: mongodb_login_withPass|failed
+  when: mongodb_login_withPass|failed or mongodb_login_withoutPass|failed

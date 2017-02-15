@@ -3,21 +3,29 @@
   - name: install MongoDB (RedHat)
     include: install.rpm.yml
     when: ansible_os_family == 'RedHat'
+# - name: install MongoDB (Debian)
+#   include: install.deb.yml
+#   when: ansible_os_family == 'Debian'
+# - name: install MongoDB (Ubuntu)
+#   include: install.ubu.yml
+#   when: ansible_os_family == 'Ubuntu'
   when: mongodb_install_enabled
+  tags: mongodb_install
 
 - name: configure MongoDB daemon
   include: configure.yml
+  tags: mongodb_configure
 
-  #- name: configure MongoDB replication
-  #  include: configure.yml
+- name: configure MongoDB authentication
+  include: auth.yml
+  tags: mongodb_auth
 
-- name: ensure mongodb is started
-  service:
-    name: mongod
-    state: started
-    enabled: true
+- name: configure MongoDB replication
+  include: replica.yml
+  tags: mongodb_replica
 
 - name: run mongoshell commands
   command: mongo {{ item.key }} --eval "{{ item.value|join(';') }}"
   with_dict: "{{ mongodb_shell_commands }}"
-  when: mongodb_shell.run
+  when: mongodb_shell_run
+  tags: mongodb_shell

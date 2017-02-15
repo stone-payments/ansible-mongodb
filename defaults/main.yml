@@ -6,8 +6,8 @@ mongodb_install_patch: "*"
 
 mongodb_daemon_bin: /usr/bin/mongod
 mongodb_daemon_serviceFile: /etc/systemd/system/mongod.service
-mongodb_daemon_user: mongod                 # Mongodb.org packages enforce
-mongodb_daemon_group: mongod                             # user and group to be mongod
+mongodb_daemon_user: mongod
+mongodb_daemon_group: mongod
 
 mongodb_conf_file: /etc/mongodb/mongod.conf            # Configuration file path
 mongodb_conf_pidFile: /var/run/mongodb/mongod.pid      # PID file path
@@ -28,9 +28,12 @@ mongodb_conf_sysLog: false                             # Log to system's syslog 
 mongodb_conf_oplogSize: 1024
 mongodb_conf_key: ""                                   # Keyfile content
 
+mongodb_admin_user: "admin"
+mongodb_admin_password: "adminPassword"
+
 mongodb_replSet_enabled: false
 mongodb_replSet_name: ""
-mongodb_replSet_peers: ""
+mongodb_replSet_master: "self"
 
 mongodb_shell_run: false
 mongodb_shell_commands: {}                             # Define mongo shell commands to run

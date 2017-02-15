@@ -16,12 +16,12 @@ processManagement:
 {% if mongodb_replSet_enabled -%}
 replication:
   oplogSizeMB: {{ mongodb_conf_oplogSize | int }}
-  replSetName: {{ mongodb_conf_replSet }}
+  replSetName: {{ mongodb_replSet_name }}
 {% endif %}
 
 {% if mongodb_conf_auth -%}
 security:
-  authorization: {{ mongodb_conf_auth }}
+  authorization: {{ 'enabled' if mongodb_conf_auth else 'disabled' }}
   {% if mongodb_replSet_enabled and mongodb_conf_auth -%}
   keyFile: {{ mongodb_conf_keyFile }}
   {% endif %}

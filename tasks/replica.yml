@@ -1,0 +1,18 @@
+---
+- name: initiate replica set
+  mongodb_replica_set:
+    state: initiated
+    replset: "{{ mongodb_replSet_name }}"
+    priority: 501
+  when: mongodb_replSet_master == "self"
+
+- name: connect to master
+  mongodb_replica_set:
+    state: present
+    replset: "{{ mongodb_replSet_name }}"
+    login_host: "{{ mongodb_replSet_master }}"
+    login_port: "{{ mongodb_conf_port }}"
+    login_user: "{{ mongodb_admin_user }}"
+    login_password: "{{ mongodb_admin_password }}"
+    member: "{{ ansible_default_ipv4.address }}:{{ mongodb_conf_port }}"
+  when: mongodb_replSet_master != "self"

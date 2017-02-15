@@ -45,9 +45,9 @@
   template:
     src: "mongod.key.j2"
     dest: "{{ mongodb_conf_keyFile }}"
-    owner: root
+    owner: "{{ mongodb_daemon_user }}"
     group: "{{ mongodb_daemon_group }}"
-    mode: "0640"
+    mode: "0600"
   when: mongodb_conf_auth
   notify: mongodb restart
 
@@ -68,3 +68,9 @@
     - mongodb restart
 
 - meta: flush_handlers
+
+- name: ensure mongodb is started and enabled
+  service:
+    name: mongod
+    state: started
+    enabled: true

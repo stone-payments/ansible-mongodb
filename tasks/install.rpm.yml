@@ -4,9 +4,10 @@
     name:
       - mongodb
       - mongodb-server
+      - python-pymongo
     state: absent
 
-- name: ensure no leftovers from previous installations
+- name: ensure no leftover unit files from previous installations
   file:
     path: "{{ item }}"
     state: absent
@@ -19,12 +20,12 @@
 
 - meta: flush_handlers
 
-- name: install MongoDB RPM GPG key
+- name: install MongoDB {{ mongodb_install_major }}.{{ mongodb_install_minor }} RPM GPG key
   rpm_key:
     state: present
     key: "https://www.mongodb.org/static/pgp/server-{{ mongodb_install_major }}.{{ mongodb_install_minor }}.asc"
 
-- name: install MongoDB repo
+- name: install MongoDB {{ mongodb_install_major }}.{{ mongodb_install_minor }} repo
   yum_repository:
     name: mongodb
     description: "MongoDB Repo"
@@ -38,7 +39,12 @@
     - mongodb-org-{{mongodb_install_major}}.{{mongodb_install_minor}}.{{mongodb_install_patch}}
     - mongodb-org-server-{{mongodb_install_major}}.{{mongodb_install_minor}}.{{mongodb_install_patch}}
     - numactl
-    - python-pymongo
+    - python-pip
+
+- name: install pymongo
+  pip:
+    name: pymongo
+    state: latest
 
 - name: remove old broken sysV script
   file:
