@@ -3,7 +3,7 @@ MongoDB
 Ansible role which manage [MongoDB](http://www.mongodb.org/)
 
 * Install and configure the MongoDB;
-* Provide hanlers for restart and reload;
+* Provide handlers for restart and reload;
 * Setup MMS authomation agent;
 
 #### Variables
