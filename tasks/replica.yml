@@ -8,6 +8,7 @@
     login_user: "{{ mongodb_admin_user }}"
     login_password: "{{ mongodb_admin_password }}"
     priority: "501"
+    member: "{{ ansible_default_ipv4.address }}:{{ mongodb_conf_port }}"
   when: mongodb_replSet_master == "self"
 
 - name: connect to master
