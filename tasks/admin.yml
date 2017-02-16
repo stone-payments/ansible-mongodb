@@ -9,6 +9,8 @@
     roles:
       - db: admin
         role: root
+      - db: local
+        role: read
     state: present
   ignore_errors: true
   when: mongodb_conf_auth == true
@@ -22,16 +24,18 @@
     roles:
       - db: admin
         role: root
+      - db: local
+        role: read
     state: present
   ignore_errors: true
   when: mongodb_conf_auth == false
   register: mongodb_login_withoutPass
 
 - block:
-  - name: switch auth to disabled
-    include: authSwitch.yml
+  - name: enable safeMode
+    include: safeMode.yml
     vars:
-      - mongodb_authSwitch: false
+      - mongodb_safeMode: true
     when: mongodb_login_withPass|failed
 
   - name: configure mongodb admin user and password
@@ -42,11 +46,13 @@
       roles:
         - db: admin
           role: root
+        - db: local
+          role: read
       state: present
 
-  - name: switch auth to desired value
-    include: authSwitch.yml
+  - name: disable safeMode
+    include: safeMode.yml
     vars:
-      - mongodb_authSwitch: true
+      - mongodb_safeMode: false
     when: mongodb_login_withPass|failed
   when: mongodb_login_withPass|failed or mongodb_login_withoutPass|failed

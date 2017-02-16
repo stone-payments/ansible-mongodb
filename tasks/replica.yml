@@ -3,7 +3,11 @@
   mongodb_replica_set:
     state: initiated
     replset: "{{ mongodb_replSet_name }}"
-    priority: 501
+    login_host: "127.0.0.1"
+    login_port: "{{ mongodb_conf_port }}"
+    login_user: "{{ mongodb_admin_user }}"
+    login_password: "{{ mongodb_admin_password }}"
+    priority: "501"
   when: mongodb_replSet_master == "self"
 
 - name: connect to master

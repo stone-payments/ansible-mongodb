@@ -52,3 +52,4 @@ mongodb_logRotate_options:
   - rotate 7
   - size 10M
 
+mongodb_safeMode: false

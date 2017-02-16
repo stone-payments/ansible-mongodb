@@ -2,7 +2,7 @@
 # {{ ansible_managed }}
 
 net:
-  bindIp: {{ mongodb_conf_bindIp }}
+  bindIp: {{ '127.0.0.1' if mongodb_safeMode else mongodb_conf_bindIp }}
   http:
     enabled: {{ mongodb_conf_httpInterface|to_nice_json|bool|lower }}
   ipv6: {{ mongodb_conf_ipv6|to_nice_json|bool|lower }}
@@ -13,13 +13,13 @@ processManagement:
   fork: true
   pidFilePath: {{ mongodb_conf_pidFile }}
 
-{% if mongodb_replSet_enabled -%}
+{% if mongodb_replSet_enabled and not mongodb_safeMode -%}
 replication:
   oplogSizeMB: {{ mongodb_conf_oplogSize | int }}
   replSetName: {{ mongodb_replSet_name }}
 {% endif %}
 
-{% if mongodb_conf_auth -%}
+{% if mongodb_conf_auth and not mongodb_safeMode -%}
 security:
   authorization: {{ 'enabled' if mongodb_conf_auth else 'disabled' }}
   {% if mongodb_replSet_enabled and mongodb_conf_auth -%}
