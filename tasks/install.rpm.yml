@@ -61,7 +61,7 @@
   with_items:
     - target: "{{ mongodb_daemon_bin }}"
       setype: mongod_exec_t
-    - target: "{{ mongodb_conf_dbPath | dirname }}(/.*)?"
+    - target: "{{ mongodb_conf_dbPath }}(/.*)?"
       setype: mongod_var_lib_t
     - target: "{{ mongodb_conf_logFile | dirname }}(/.*)?"
       setype: mongod_log_t
