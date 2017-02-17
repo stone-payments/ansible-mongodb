@@ -18,7 +18,7 @@
 
 - name: configure MongoDB admin user
   include: admin.yml
-  when: mongodb_replSet_master == "self"
+  when: mongodb_replSet_isMaster
   tags: mongodb_admin
 
 - name: configure MongoDB replication

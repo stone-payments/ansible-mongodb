@@ -9,15 +9,15 @@
     login_password: "{{ mongodb_admin_password }}"
     priority: "501"
     member: "{{ ansible_default_ipv4.address }}:{{ mongodb_conf_port }}"
-  when: mongodb_replSet_master == "self"
+  when: mongodb_replSet_isMaster
 
 - name: connect to master
   mongodb_replica_set:
     state: present
     replset: "{{ mongodb_replSet_name }}"
     login_host: "{{ mongodb_replSet_master }}"
-    login_port: "{{ mongodb_conf_port }}"
-    login_user: "{{ mongodb_admin_user }}"
+    login_port: "{{ mongodb_admin_user }}"
+    login_user: "{{ mongodb_admin_password }}"
     login_password: "{{ mongodb_admin_password }}"
-    member: "{{ ansible_default_ipv4.address }}:{{ mongodb_conf_port }}"
-  when: mongodb_replSet_master != "self"
+    member: "{{ ansible_default_ipv4.address }}:27017"
+  when: not mongodb_replSet_isMaster

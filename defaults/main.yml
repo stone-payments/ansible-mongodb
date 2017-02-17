@@ -33,7 +33,8 @@ mongodb_admin_password: "adminPassword"
 
 mongodb_replSet_enabled: false
 mongodb_replSet_name: ""
-mongodb_replSet_master: "self"
+mongodb_replSet_master: "127.0.0.1"
+mongodb_replSet_isMaster: false
 
 mongodb_shell_run: false
 mongodb_shell_commands: {}                             # Define mongo shell commands to run
