@@ -69,6 +69,16 @@
       setype: mongod_var_run_t
   notify: mongodb restart
 
+- name: ensure SELinux file context are applied
+  shell: restorecon -vr "{{ item }}"
+  with_items:
+    - "{{ mongodb_daemon_bin }}"
+    - "{{ mongodb_conf_dbPath }}"
+    - "{{ mongodb_conf_logFile | dirname }}"
+    - "{{ mongodb_conf_pidFile | dirname }}"
+  register: restorecon
+  changed_when: restorecon.stdout != ""
+
 - name: configure SELinux network ports for mongodb
   seport:
     ports: "{{ mongodb_conf_port }}"
