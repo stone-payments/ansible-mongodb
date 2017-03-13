@@ -52,38 +52,6 @@
     state: absent
   notify: reload systemd
 
-- name: configure SELinux file contexts for mongodb
-  sefcontext:
-    target: "{{ item.target }}"
-    setype: "{{ item.setype }}"
-    reload: true
-    state: present
-  with_items:
-    - target: "{{ mongodb_daemon_bin }}"
-      setype: mongod_exec_t
-    - target: "{{ mongodb_conf_dbPath }}(/.*)?"
-      setype: mongod_var_lib_t
-    - target: "{{ mongodb_conf_logFile | dirname }}(/.*)?"
-      setype: mongod_log_t
-    - target: "{{ mongodb_conf_pidFile | dirname }}(/.*)?"
-      setype: mongod_var_run_t
-  notify: mongodb restart
-
-- name: ensure SELinux file context are applied
-  shell: restorecon -vr "{{ item }}"
-  with_items:
-    - "{{ mongodb_daemon_bin }}"
-    - "{{ mongodb_conf_dbPath }}"
-    - "{{ mongodb_conf_logFile | dirname }}"
-    - "{{ mongodb_conf_pidFile | dirname }}"
-  register: restorecon
-  changed_when: restorecon.stdout != ""
-
-- name: configure SELinux network ports for mongodb
-  seport:
-    ports: "{{ mongodb_conf_port }}"
-    proto: tcp
-    setype: mongod_port_t
-    reload: true
-    state: present
-  notify: mongodb restart
+- name: configure SELinux for MongoDB
+  include: selinux.yml
+  when: mongodb_install_selinux
