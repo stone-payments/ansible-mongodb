@@ -20,10 +20,10 @@ the following excerpt:
   host: all
   roles: buy4.mongodb
   vars:
-    - mongodb_conf_bindIp: "0.0.0.0"
-    - mongodb_replSet_name: "someReplicaSetName"
-    - mongodb_replSet_master: "1.2.3.4"
-    - mongodb_replSet_isMaster: "{{ true if mongodb_replSet_master in ansible_all_ipv4_addresses else false }}"
+    mongodb_conf_bindIp: "0.0.0.0"
+    mongodb_replSet_name: "someReplicaSetName"
+    mongodb_replSet_master: "1.2.3.4"
+    mongodb_replSet_isMaster: "{{ true if mongodb_replSet_master in ansible_all_ipv4_addresses else false }}"
 ```
 
 # Other configs
