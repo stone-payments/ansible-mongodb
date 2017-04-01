@@ -11,7 +11,7 @@ mongodb_daemon_user: mongod
 mongodb_daemon_group: mongod
 
 mongodb_conf_file: /etc/mongodb/mongod.conf            # Configuration file path
-mongodb_conf_pidFile: /var/run/mongodb/mongod.pid      # PID file path
+mongodb_conf_pidFile: /var/run/mongod/mongod.pid      # PID file path
 mongodb_conf_logFile: /var/log/mongodb/mongod.log      # Log file path (not recommended to be changed)
 mongodb_conf_keyFile: /etc/mongodb/mongod.key          # Keyfile path
 mongodb_conf_dbPath: /var/lib/mongo                    # Directory for datafiles
