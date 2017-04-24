@@ -1,4 +1,4 @@
-stone.mongodb
+stone-payments.mongodb
 ============
 Role for Ansible which manages MongoDB in a standalone setup or replica set
 
