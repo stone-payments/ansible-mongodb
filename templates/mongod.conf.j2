@@ -32,6 +32,9 @@ storage:
   engine: {{ mongodb_conf_dbEngine }}
   journal:
     enabled: {{ mongodb_conf_journal|to_nice_json|bool|lower }}
+  wiredTiger:
+    engineConfig:
+      cacheSizeGB: 1
 
 systemLog:
   destination: file
