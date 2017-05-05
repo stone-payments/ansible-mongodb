@@ -371,7 +371,7 @@ def main():
             login_host      = dict(default='localhost'),
             login_port      = dict(type='int', default=DEFAULT_PORT),
             login_user      = dict(default=None),
-            login_password  = dict(default=None),
+            login_password  = dict(default=None, no_log=True),
             replset         = dict(default=None),
             member          = dict(default=None),
             arbiter_only    = dict(type='bool', choices=BOOLEANS, default='no'),
