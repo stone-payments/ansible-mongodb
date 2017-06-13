@@ -6,7 +6,7 @@ Wants=network.target nohugepages.service
 After=network.target
 
 [Service]
-Type=forking
+Type=simple
 RuntimeDirectory=mongod
 PIDFile={{ mongodb_conf_pidFile }}
 ExecStart={{ mongodb_daemon_bin }} --config {{ mongodb_conf_file }}
@@ -14,8 +14,8 @@ ExecReload=/bin/kill -HUP $MAINPID
 Restart=always
 User={{ mongodb_daemon_user }}
 Group={{ mongodb_daemon_group }}
-StandardOutput=syslog
-StandardError=syslog
+StandardOutput=journal
+StandardError=journal
 LimitFSIZE=infinity
 LimitCPU=infinity
 LimitAS=infinity

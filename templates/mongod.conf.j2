@@ -10,7 +10,7 @@ net:
   port: {{ mongodb_conf_port|int }}
 
 processManagement:
-  fork: true
+  fork: false
   pidFilePath: {{ mongodb_conf_pidFile }}
 
 {% if mongodb_replSet_enabled and not mongodb_safeMode -%}
@@ -37,6 +37,4 @@ storage:
       cacheSizeGB: 1
 
 systemLog:
-  destination: file
-  logAppend: {{ mongodb_conf_logAppend|to_nice_json|bool|lower }}
-  path: {{ mongodb_conf_logFile }}
+  verbosity: {{ mongodb_conf_verbosity }}

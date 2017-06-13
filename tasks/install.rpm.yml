@@ -61,7 +61,6 @@
     mode: "0755"
   with_items:
     - path: "{{ mongodb_conf_dbPath }}"
-    - path: "{{ mongodb_conf_logFile | dirname }}"
     - path: "{{ mongodb_conf_pidFile | dirname }}"
   notify: mongodb restart
 

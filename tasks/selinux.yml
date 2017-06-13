@@ -10,8 +10,6 @@
       setype: mongod_exec_t
     - target: "{{ mongodb_conf_dbPath }}(/.*)?"
       setype: mongod_var_lib_t
-    - target: "{{ mongodb_conf_logFile | dirname }}(/.*)?"
-      setype: mongod_log_t
     - target: "{{ mongodb_conf_pidFile | dirname }}(/.*)?"
       setype: mongod_var_run_t
   notify: mongodb restart
@@ -21,7 +19,6 @@
   with_items:
     - "{{ mongodb_daemon_bin }}"
     - "{{ mongodb_conf_dbPath }}"
-    - "{{ mongodb_conf_logFile | dirname }}"
     - "{{ mongodb_conf_pidFile | dirname }}"
   register: restorecon
   changed_when: restorecon.stdout != ""

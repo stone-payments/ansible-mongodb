@@ -1,10 +1,4 @@
 ---
-- name: configure mongodb log rotation
-  template:
-    src: logrotate.conf.j2
-    dest: "{{ mongodb_logRotate_file }}"
-  when: mongodb_logRotate_enabled
-
 - name: configure mongodb replication key
   template:
     src: "mongod.key.j2"
