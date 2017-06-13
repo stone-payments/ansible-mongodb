@@ -16,6 +16,11 @@ User={{ mongodb_daemon_user }}
 Group={{ mongodb_daemon_group }}
 StandardOutput=syslog
 StandardError=syslog
+LimitFSIZE=infinity
+LimitCPU=infinity
+LimitAS=infinity
+LimitNOFILE=64000
+LimitNPROC=64000
 
 [Install]
 WantedBy=multi-user.target
