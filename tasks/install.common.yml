@@ -1,0 +1,49 @@
+- name: install pymongo
+  pip:
+    name: pymongo
+    state: latest
+
+- name: remove old broken sysV script
+  file:
+    path: "/etc/rc.d/init.d/mongod"
+    state: absent
+  notify: reload systemd
+
+- name: configure mongodb group
+  group:
+    name: "{{ mongodb_daemon_user }}"
+    state: present
+
+- name: configure mongodb user
+  user:
+    name: "{{ mongodb_daemon_user }}"
+    group: "{{ mongodb_daemon_group }}"
+    state: present
+
+- name: create mongodb-writable directories
+  file:
+    state: directory
+    path: "{{ item.path }}"
+    owner: "{{ mongodb_daemon_user }}"
+    group: "{{ mongodb_daemon_group }}"
+    mode: "0755"
+  with_items:
+    - path: "{{ mongodb_conf_dbPath }}"
+    - path: "{{ mongodb_conf_pidFile | dirname }}"
+  notify: mongodb restart
+
+- name: create mongodb read-only directories
+  file:
+    state: directory
+    path: "{{ mongodb_conf_file | dirname }}"
+    owner: root
+    group: root
+    mode: "0755"
+  with_items:
+    - path: "{{ mongodb_conf_file | dirname }}"
+    - path: "{{ mongodb_conf_keyFile | dirname }}"
+  notify: mongodb restart
+
+- name: configure SELinux for MongoDB
+  include: selinux.yml
+  when: mongodb_install_selinux and ansible_selinux and ansible_selinux.status == "enabled"

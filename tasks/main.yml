@@ -3,12 +3,11 @@
   - name: install MongoDB (RedHat)
     include: install.rpm.yml
     when: ansible_os_family == 'RedHat'
-# - name: install MongoDB (Debian)
-#   include: install.deb.yml
-#   when: ansible_os_family == 'Debian'
-# - name: install MongoDB (Ubuntu)
-#   include: install.ubu.yml
-#   when: ansible_os_family == 'Ubuntu'
+  - name: install MongoDB (Debian/Ubuntu)
+    include: install.deb.yml
+    when: ansible_os_family == 'Debian'
+  - name: common installation steps
+    include: install.common.yml
   when: mongodb_install_enabled
   tags: mongodb_install
 
