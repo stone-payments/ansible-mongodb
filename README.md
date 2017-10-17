@@ -8,7 +8,7 @@ loopback-only, standalone MongoDB setup. Just include it in a play:
 ```
 - name: install mongodb
   hosts: all
-  roles: buy4.mongodb
+  roles: stone-payments.mongodb
 ```
 
 # Replica set setup
@@ -18,7 +18,7 @@ the following excerpt:
 ```
 - name: install mongodb replica set
   host: all
-  roles: buy4.mongodb
+  roles: stone-payments.mongodb
   vars:
     mongodb_conf_bindIp: "0.0.0.0"
     mongodb_replSet_name: "someReplicaSetName"
