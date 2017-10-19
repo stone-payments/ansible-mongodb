@@ -2,7 +2,7 @@ stone-payments.mongodb
 ============
 Role for Ansible which manages MongoDB in a standalone setup or replica set
 
-# Quickstart
+## Quickstart
 There's absolute no variable needed to setup a basic, passwordless,
 loopback-only, standalone MongoDB setup. Just include it in a play:
 ```
@@ -11,7 +11,7 @@ loopback-only, standalone MongoDB setup. Just include it in a play:
   roles: stone-payments.mongodb
 ```
 
-# Replica set setup
+## Replica set setup
 In order to build a replica set, you need to inform the master that he is a
 master, and a replica on which master to connect to. You can do all this with
 the following excerpt:
@@ -26,12 +26,18 @@ the following excerpt:
     mongodb_replSet_isMaster: "{{ true if mongodb_replSet_master in ansible_all_ipv4_addresses else false }}"
 ```
 
-# Other configs
+## Other configs
 I believe almost every other config is self-explanatory or directly related to
 a MongoDB core feature. Simply override the configs on `defaults/main.yml` and
 they will be (hopefully) applied to your system.
 
-# Included ansible module
+## Included ansible module
 There's a Python Ansible module included in the `library` folder. Altough it
 needs some refactoring, it is able to join and remove nodes from a mongodb
 replica set in an idempotent way.
+
+## Contributing
+Just open a PR. We love PRs!
+
+## License
+This role is distributed under the MIT license.
