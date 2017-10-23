@@ -6,8 +6,20 @@ driver:
 lint:
   name: yamllint
 platforms:
-  - name: centos7
-    image: centos:7
+  - name: centos7_4
+    image: centos:7.4.1708
+    command: /usr/sbin/init
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+  - name: centos7_3
+    image: centos:7.3.1611
+    command: /usr/sbin/init
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+  - name: centos7_2
+    image: centos:7.2.1511
     command: /usr/sbin/init
     privileged: true
     volumes:
