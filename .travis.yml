@@ -1,0 +1,9 @@
+---
+sudo: required
+services:
+  - docker
+language: python
+before_install:
+  - pip install molecule docker-py ansible
+script:
+  - molecule converge -s default
