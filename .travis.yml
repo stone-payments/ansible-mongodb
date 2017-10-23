@@ -1,9 +1,12 @@
 ---
+env:
+  - ROLE_NAME=stone-payments.mongodb
 sudo: required
 services:
   - docker
 language: python
 before_install:
+  - ln -s $TRAVIS_BUILD_DIR $(dirname "$TRAVIS_BUILD_DIR")/$ROLE_NAME
   - pip install molecule docker-py ansible
   - molecule dependency
 script:
