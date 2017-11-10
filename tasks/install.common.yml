@@ -18,6 +18,7 @@
   user:
     name: "{{ mongodb_daemon_user }}"
     group: "{{ mongodb_daemon_group }}"
+    shell: /bin/false
     state: present
 
 - name: create mongodb-writable directories
