@@ -21,10 +21,10 @@ mongodb_conf_cpu: yes                                  # Periodically show cpu a
 mongodb_conf_httpInterface: false                      # Enable (deprecated) http interface
 mongodb_conf_ipv6: false                               # Enable IPv6 support
 mongodb_conf_journal: true                             # Enable journaling
-mongodb_conf_verbosity: 1
+mongodb_conf_logging: "{{ mongodb_conf_logging_defaults }}" # systemLog settings dictionary
+mongodb_conf_verbosity: 1                              # Verbosity when mongodb_conf_logging_defaults is used
 mongodb_conf_maxConns: 800                             # Max number of simultaneous connections
 mongodb_conf_port: 27017                               # Specify TCP port number
-mongodb_conf_sysLog: false                             # Log to system's syslog facility instead of file (ignored if logpath set)
 mongodb_conf_oplogSize: 1024
 mongodb_conf_key: ""                                   # Keyfile content
 

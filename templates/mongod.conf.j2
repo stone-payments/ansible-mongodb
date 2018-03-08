@@ -37,4 +37,4 @@ storage:
       cacheSizeGB: 1
 
 systemLog:
-  verbosity: {{ mongodb_conf_verbosity }}
+{{ mongodb_conf_logging | to_nice_yaml | indent(2, true) }}
