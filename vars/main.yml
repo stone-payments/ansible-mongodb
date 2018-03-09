@@ -1,3 +1,0 @@
-# https://docs.mongodb.com/manual/reference/configuration-options/#systemlog-options
-mongodb_conf_logging_defaults:
-  verbosity: 1
