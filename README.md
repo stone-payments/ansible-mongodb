@@ -46,7 +46,22 @@ connect to. You can do all this with the following excerpt:
     mongodb_replSet_master: "1.2.3.4"
     mongodb_replSet_isMaster: "{{ true if mongodb_replSet_master in ansible_all_ipv4_addresses else false }}"
 ```
-
+### Logging
+You can set any [systemLog](https://docs.mongodb.com/manual/reference/configuration-options/#systemlog-options)
+option by providing `mongodb_conf_logging` dictionary:
+```
+- name: install mongodb with network debug logging
+  host: all
+  roles: stone-payments.mongodb
+  vars:
+    mongodb_conf_logging:
+      verbosity: 0
+      component:
+        network:
+          verbosity: 5
+      destination: file
+      path: /var/log/mongodb/mongod.log
+```
 ### Other configs
 I believe almost every other config is self-explanatory or directly related to a MongoDB core feature. Simply override
 the configs on `defaults/main.yml` and they will be (hopefully) applied to your system.
