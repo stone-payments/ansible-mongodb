@@ -15,16 +15,16 @@
   include: configure.yml
   tags: mongodb_configure
 
-- name: configure MongoDB admin user
-  include: admin.yml
-  when: mongodb_replSet_isMaster or not mongodb_replSet_enabled
-  tags: mongodb_admin
-
 - name: configure MongoDB replication
   include: replica.yml
   when: mongodb_replSet_enabled
   tags: mongodb_replica
-
+  
+- name: configure MongoDB admin user
+  include: admin.yml
+  when: mongodb_replSet_isMaster or not mongodb_replSet_enabled
+  tags: mongodb_admin
+  
 - name: run mongoshell commands
   command: mongo {{ item.key }} --eval "{{ item.value|join(';') }}"
   with_dict: "{{ mongodb_shell_commands }}"
