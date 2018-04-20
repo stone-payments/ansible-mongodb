@@ -1,4 +1,9 @@
 ---
+- name: ensure EPEL is installed
+  package:
+    name: epel-release
+    state: present
+
 - name: ensure mongo from EPEL is not installed
   yum:
     name:
