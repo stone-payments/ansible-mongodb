@@ -1,23 +1,38 @@
 ---
-- name: initiate replica set
+- name: init replica set
   mongodb_replica_set:
-    state: initiated
-    replset: "{{ mongodb_replSet_name }}"
-    login_host: "127.0.0.1"
+    state: "{{mongodb_replica_state}}"    
+    replica_set: "{{ mongodb_replSet_name }}"
+    login_host: "{{mongodb_replSet_master}}"
     login_port: "{{ mongodb_conf_port }}"
-    login_user: "{{ mongodb_admin_user }}"
-    login_password: "{{ mongodb_admin_password }}"
-    priority: "501"
-    member: "{{ mongodb_replSet_member }}:{{ mongodb_conf_port }}"
+    votes: "{{mongodb_replica_votes}}"
+    host_port: "{{ mongodb_conf_port }}"
+    host_name: "{{ production_ip }}"    
   when: mongodb_replSet_isMaster
+  register: init_result
+  ignore_errors: yes
 
-- name: connect to master
+- name: register for replica set into master
   mongodb_replica_set:
-    state: present
-    replset: "{{ mongodb_replSet_name }}"
-    login_host: "{{ mongodb_replSet_master }}"
+    state: "{{mongodb_replica_state}}"        
+    replica_set: "{{ mongodb_replSet_name }}"
+    login_host: "{{mongodb_replSet_master}}"
+    login_port: "{{ mongodb_conf_port }}"
+    votes: "{{mongodb_replica_votes}}"
+    host_port: "{{ mongodb_conf_port }}"
+    host_name: "{{ production_ip }}"    
+  when: not mongodb_replSet_isMaster
+  register: register_result
+
+- name: register for replica set into master using credentials
+  mongodb_replica_set:
+    state: "{{mongodb_replica_state}}"        
+    replica_set: "{{ mongodb_replSet_name }}"
+    login_host: "{{mongodb_replSet_master}}"
     login_port: "{{ mongodb_conf_port }}"
     login_user: "{{ mongodb_admin_user }}"
     login_password: "{{ mongodb_admin_password }}"
-    member: "{{ mongodb_replSet_member }}:{{ mongodb_conf_port }}"
-  when: not mongodb_replSet_isMaster
+    votes: "{{mongodb_replica_votes}}"
+    host_port: "{{ mongodb_conf_port }}"
+    host_name: "{{ production_ip }}"    
+  when: init_result is failed or register_result is failed
