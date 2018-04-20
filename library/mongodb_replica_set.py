@@ -1,8 +1,6 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
-# (c) 2014, George Miroshnykov <george.miroshnykov@gmail.com>
-# (c) 2014, Olivier Perbellini <olivier.perbellini@gmail.com>
+# (c) 2015-2018, Sergei Antipov, 2GIS LLC
 #
 # This file is part of Ansible
 #
@@ -21,12 +19,11 @@
 
 DOCUMENTATION = '''
 ---
-module: mongodb_replica_set
-version_added: "1.5"
-short_description: Initiate, configure, add and remove members from MongoDB replica set
+module: mongodb_replication
+short_description: Adds or removes a node from a MongoDB Replica Set.
 description:
-   - 'Initiate, configure, add and remove members from MongoDB replica set.
-     See: http://docs.mongodb.org/manual/reference/replica-configuration/'
+    - Adds or removes host from a MongoDB replica set. Initialize replica set if it needed.
+version_added: "2.4"
 options:
     login_user:
         description:
@@ -47,401 +44,424 @@ options:
         description:
             - The port to connect to
         required: false
-        default: 6379
-    member:
+        default: 27017
+    login_database:
         description:
-            - The host[:port] to add/remove from a replica set.
+            - The database where login credentials are stored
+        required: false
+        default: admin
+    replica_set:
+        description:
+            - Replica set to connect to (automatically connects to primary for writes)
         required: false
         default: null
-    arbiter_only:
+    host_name:
         description:
-            - Should a new member be added as arbiter.
+            - The name of the host to add/remove from replica set
+        required: true
+    host_port:
+        description:
+            - The port of the host, which should be added/deleted from RS
+        required: true
+        default: null
+    host_type:
+        description:
+            - The type of the host in replica set
         required: false
-        default: false
+        default: replica
+        choices: [ "replica", "arbiter" ]
+    ssl:
+        description:
+            - Whether to use an SSL connection when connecting to the database
+        default: False
+    ssl_cert_reqs:
+        description:
+            - Specifies whether a certificate is required from the other side of the connection, and whether it will be validated if provided.
+        required: false
+        default: "CERT_REQUIRED"
+        choices: ["CERT_REQUIRED", "CERT_OPTIONAL", "CERT_NONE"]
     build_indexes:
         description:
             - Determines whether the mongod builds indexes on this member.
-              Do not set to false for instances that receive queries from clients.
         required: false
         default: true
     hidden:
         description:
             - When this value is true, the replica set hides this instance,
               and does not include the member in the output of db.isMaster()
-              or isMaster.
-              This prevents read operations (i.e. queries) from ever reaching
-              this host by way of secondary read preference.
+              or isMaster
         required: false
         default: false
     priority:
         description:
-            - Specify higher values to make a member more eligible to become
-              primary, and lower values to make the member less eligible to
-              become primary.
-              Priorities are only used in comparison to each other.
-              Members of the set will veto election requests from members
-              when another eligible member has a higher priority value.
-              Changing the balance of priority in a replica set will trigger
-              an election.
+            - A number that indicates the relative eligibility of a member
+              to become a primary
         required: false
         default: 1.0
     slave_delay:
         description:
-            - Describes the number of seconds "behind" the primary that this
-              replica set member should "lag."
-              Use this option to create delayed members, that maintain a copy
-              of the data that reflects the state of the data set at some
-              amount of time in the past, specified in seconds.
-              Typically such delayed members help protect against human error,
-              and provide some measure of insurance against the unforeseen
-              consequences of changes and updates.
+            - The number of seconds behind the primary that this replica set
+              member should lag
         required: false
         default: 0
     votes:
         description:
-            - Controls the number of votes a server will cast in a
-              replica set election.
-              The number of votes each member has can be any non-negative integer,
-              but it is highly recommended each member has 1 or 0 votes.
-        required: false
+            - The number of votes a server will cast in a replica set election
         default: 1
-    chainingAllowed:
-        description:
-            - When chainingAllowed is true, the replica set allows secondary
-              members to replicate from other secondary members.
-              When chainingAllowed is false, secondaries can replicate only
-              from the primary.
-        required: false
-        default: true
-    woption:
-        description:
-            - Provides the ability to disable write concern entirely as well as
-              specify the write concern for replica sets.
-        required: false
-        default: 1
-    joption:
-        description:
-            - Confirms that the mongod instance has written the data to the
-              on-disk journal. This ensures that data is not lost if the mongod
-              instance shuts down unexpectedly. Set to true to enable.
-        required: false
-        default: false
-    wtimeout:
-        description:
-            - This option specifies a time limit, in milliseconds, for the write
-            concern. wtimeout is only applicable for woption values greater than 1.
-        required: false
-        default: 0
-    heartbeat:
-        description:
-            - Number of seconds that the replica set members wait for a successful
-              heartbeat from each other. If a member does not respond in time,
-              other members mark the delinquent member as inaccessible.
-        required: false
-        default: 10
     state:
+        state:
         description:
-            - The desired state of the replica set
-        required: true
-        default: null
-        choices: [ "initiated", "reconf" "present", "absent" ]
+            - The replica set member state
+        required: false
+        default: present
+        choices: [ "present", "absent" ]
 notes:
-    - See also M(mongodb_user)
-requirements: [ pymongo ]
-author: George Miroshnykov <george.miroshnykov@gmail.com>
+    - Requires the pymongo Python package on the remote host, version 3.2+. It
+      can be installed using pip or the OS package manager. @see http://api.mongodb.org/python/current/installation.html
+requirements: [ "pymongo" ]
+author: "Sergei Antipov @UnderGreen"
 '''
 
 EXAMPLES = '''
-# initiate a replica set
-- mongodb_replica_set: state=initiated
+# Add 'mongo1.dev:27017' host into replica set as replica (Replica will be initiated if it not exists)
+- mongodb_replication: replica_set=replSet host_name=mongo1.dev host_port=27017 state=present
 
-# Reconfigure the settings of a replica set
-- mongodb_replica_set: state=reconf woption:2 wtimeout:100 joption:true
+# Add 'mongo2.dev:30000' host into replica set as arbiter
+- mongodb_replication: replica_set=replSet host_name=mongo2.dev host_port=30000 host_type=arbiter state=present
 
-# add a replica set member
-- mongodb_replica_set: member=secondary.example.com state=present
+# Add 'mongo3.dev:27017' host into replica set as replica and authorization params
+- mongodb_replication: replica_set=replSet login_host=mongo1.dev login_user=siteRootAdmin login_password=123456 host_name=mongo3.dev host_port=27017 state=present
 
-# add an arbiter on custom port
-- mongodb_replica_set: member=arbiter.example.com:30000 arbiter_only=yes state=present
+# Add 'mongo4.dev:27017' host into replica set as replica via SSL
+- mongodb_replication: replica_set=replSet host_name=mongo4.dev host_port=27017 ssl=True state=present
 
-# remove a replica set member
-- mongodb_replica_set: member=secondary.example.com state=absent
-
-# use all possible parameters when adding a member (please don't do that in production):
-- mongodb_replica_set: >
-    member=secondary.example.com
-    state=present
-    arbiter_only=yes
-    build_indexes=no
-    hidden=yes
-    priority=0
-    slave_delay=3600
-    votes=42
+# Remove 'mongo4.dev:27017' host from the replica set
+- mongodb_replication: replica_set=replSet host_name=mongo4.dev host_port=27017 state=absent
 '''
 
-DEFAULT_PORT = 27017
-
+RETURN = '''
+host_name:
+  description: The name of the host to add/remove from replica set
+  returned: success
+  type: string
+  sample: "mongo3.dev"
+host_port:
+  description: The port of the host, which should be added/deleted from RS
+  returned: success
+  type: int
+  sample: 27017
+host_type:
+  description: The type of the host in replica set
+  returned: success
+  type: string
+  sample: "replica"
+'''
+import ConfigParser
+import ssl as ssl_lib
 import time
-import random
-
-pymongo_found = False
+from datetime import datetime as dtdatetime
+from distutils.version import LooseVersion
 try:
     from pymongo.errors import ConnectionFailure
     from pymongo.errors import OperationFailure
+    from pymongo.errors import ConfigurationError
     from pymongo.errors import AutoReconnect
+    from pymongo.errors import ServerSelectionTimeoutError
+    from pymongo import version as PyMongoVersion
     from pymongo import MongoClient
-    pymongo_found = True
 except ImportError:
-    try:  # for older PyMongo 2.2
-        from pymongo import Connection as MongoClient
-        pymongo_found = True
-    except ImportError:
-        pass
+    pymongo_found = False
+else:
+    pymongo_found = True
 
-def normalize_member_host(member_host):
-    if ':' not in member_host:
-        member_host = member_host + ':' + str(DEFAULT_PORT)
-    return member_host
+# =========================================
+# MongoDB module specific support methods.
+#
+def check_compatibility(module, client):
+    srv_info = client.server_info()
+    if LooseVersion(PyMongoVersion) <= LooseVersion('3.2'):
+        module.fail_json(msg='Note: you must use pymongo 3.2+')
+    if LooseVersion(srv_info['version']) >= LooseVersion('3.4') and LooseVersion(PyMongoVersion) <= LooseVersion('3.4'):
+        module.fail_json(msg='Note: you must use pymongo 3.4+ with MongoDB 3.4.x')
+    if LooseVersion(srv_info['version']) >= LooseVersion('3.6') and LooseVersion(PyMongoVersion) <= LooseVersion('3.6'):
+        module.fail_json(msg='Note: you must use pymongo 3.6+ with MongoDB 3.6.x')
 
-def create_member(host, **kwargs):
-    member = dict(host = host)
 
-    if kwargs['arbiter_only']:
-        member['arbiterOnly'] = True
+def check_members(state, module, client, host_name, host_port, host_type):
+    admin_db = client['admin']
+    local_db = client['local']
 
-    if not kwargs['build_indexes']:
-        member['buildIndexes'] = False
+    if local_db.system.replset.count() > 1:
+        module.fail_json(msg='local.system.replset has unexpected contents')
 
-    if kwargs['hidden']:
-        member['hidden'] = True
+    cfg = local_db.system.replset.find_one()
+    if not cfg:
+        module.fail_json(msg='no config object retrievable from local.system.replset')
+        
+    for member in cfg['members']:
 
-    if kwargs['priority'] != 1.0:
-        member['priority'] = kwargs['priority']
+        if state == 'present':
+            if host_type == 'replica':
+                if "{0}:{1}".format(host_name, host_port) in member['host']:
+                    module.exit_json(changed=False, host_name=host_name, host_port=host_port, host_type=host_type)
+            else:
+                if "{0}:{1}".format(host_name, host_port) in member['host'] and member['arbiterOnly']:
+                    module.exit_json(changed=False, host_name=host_name, host_port=host_port, host_type=host_type)
+        else:
+            if host_type == 'replica':
+                if "{0}:{1}".format(host_name, host_port) not in member['host']:
+                    module.exit_json(changed=False, host_name=host_name, host_port=host_port, host_type=host_type)
+            else:
+                if "{0}:{1}".format(host_name, host_port) not in member['host'] and member['arbiterOnly']:
+                    module.exit_json(changed=False, host_name=host_name, host_port=host_port, host_type=host_type)
 
-    if kwargs['slave_delay'] != 0:
-        member['slaveDelay'] = kwargs['slave_delay']
-
-    if kwargs['votes'] != 1:
-        member['votes'] = kwargs['votes']
-
-    return member
-
-def create_settings(**kwargs):
-    settings = {}
-    getLastErrorDefaults = {}
-
-    if kwargs['chainingAllowed']:
-        settings['chainingAllowed'] = kwargs['chainingAllowed']
-    else:
-        settings['chainingAllowed'] = True
-
-    if kwargs['heartbeat']:
-        settings['heartbeat'] = kwargs['heartbeat']
-    else:
-        settings['heartbeat'] = 10
-
-    if kwargs['woption']:
-        try:
-            getLastErrorDefaults['w'] = int(kwargs['woption'])
-        except ValueError:
-            getLastErrorDefaults['w'] = kwargs['woption']
-    else:
-        getLastErrorDefaults['w'] = 1
-
-    if kwargs['joption']:
-        getLastErrorDefaults['j'] = kwargs['joption']
-    else:
-        getLastErrorDefaults['w'] = False
-
-    if kwargs['wtimeout']:
-        getLastErrorDefaults['wtimeout'] = kwargs['wtimeout']
-    else:
-        getLastErrorDefaults['wtimeout'] = 0
-
-    settings['getLastErrorDefaults'] = getLastErrorDefaults
-
-    return settings
-
-def authenticate(client, login_user, login_password):
-    # check if we should skip auth
-    skip_auth = True
-    try:
-        client.database_names()
-    except OperationFailure as e:
-        skip_auth = False
-
-    if (not skip_auth and login_user and login_password):
-        client.admin.authenticate(login_user, login_password)
-
-def rs_is_master(client):
-    return client.local.command('isMaster')
-
-def rs_get_config(client):
-    return client.local.system.replset.find_one()
-
-def rs_initiate(client, rs_config = None):
-    if rs_config is None:
-        client.admin.command('replSetInitiate')
-    else:
-        client.admin.command('replSetInitiate', rs_config)
-
-def rs_get_member(rs_config, member):
-    a = filter(lambda x: x['host'] == member, rs_config['members'])
-    return a[0] if a else None
-
-def rs_get_next_member_id(rs_config):
-    if rs_config is None or rs_config['members'] is None:
-        return 0
-
-    def compare_max_id(max_id, current_member):
-        id = int(current_member['_id'])
-        return id if id > max_id else max_id
-
-    max_id = reduce(compare_max_id, rs_config['members'], 0)
-    return max_id + 1
-
-def rs_add_member(rs_config, member):
-    rs_config['members'].append(member)
-    rs_config['version'] = rs_config['version'] + 1
-    return rs_config
-
-def rs_remove_member(rs_config, member):
-    for i, candidate in enumerate(rs_config['members']):
-        if candidate['host'] == member['host']:
-            del rs_config['members'][i]
-            break
-
-    rs_config['version'] = rs_config['version'] + 1
-    return rs_config
-
-def rs_reconfigure(client, rs_config):
-    try:
-        client.admin.command('replSetReconfig', rs_config)
-    except AutoReconnect:
-        pass
-
-def rs_wait_for_ok_and_primary(client, timeout = 60):
+def add_host(module, client, host_name, host_port, host_type, timeout=180, **kwargs):
+    start_time = dtdatetime.now()
     while True:
-        status = client.admin.command('replSetGetStatus', check=False)
-        if status['ok'] == 1 and status['myState'] == 1:
-            return
+        try:
+            admin_db = client['admin']
+            local_db = client['local']
 
-        timeout = timeout - 1
-        if timeout == 0:
-            raise Exception('reached timeout while waiting for rs.status() to become ok=1')
+            if local_db.system.replset.count() > 1:
+                module.fail_json(msg='local.system.replset has unexpected contents')
+
+            cfg = local_db.system.replset.find_one()
+            if not cfg:
+                module.fail_json(msg='no config object retrievable from local.system.replset')
+
+            cfg['version'] += 1
+            max_id = max(cfg['members'], key=lambda x:x['_id'])
+            new_host = { '_id': max_id['_id'] + 1, 'host': "{0}:{1}".format(host_name, host_port) }
+            if host_type == 'arbiter':
+                new_host['arbiterOnly'] = True
+
+            if not kwargs['build_indexes']:
+                new_host['buildIndexes'] = False
+
+            if kwargs['hidden']:
+                new_host['hidden'] = True
+
+            if kwargs['priority'] != 1.0:
+                new_host['priority'] = kwargs['priority']
+
+            if kwargs['slave_delay'] != 0:
+                new_host['slaveDelay'] = kwargs['slave_delay']
+
+            if kwargs['votes'] != 1:
+                new_host['votes'] = kwargs['votes']
+
+            cfg['members'].append(new_host)
+            admin_db.command('replSetReconfig', cfg)
+            return
+        except (OperationFailure, AutoReconnect) as e:
+            if (dtdatetime.now() - start_time).seconds > timeout:
+                module.fail_json(msg='reached timeout while waiting for rs.reconfig(): %s' % str(e))
+            time.sleep(5)
+
+def remove_host(module, client, host_name, timeout=180):
+    start_time = dtdatetime.now()
+    while True:
+        try:
+            admin_db = client['admin']
+            local_db = client['local']
+
+            if local_db.system.replset.count() > 1:
+                module.fail_json(msg='local.system.replset has unexpected contents')
+
+            cfg = local_db.system.replset.find_one()
+            if not cfg:
+                module.fail_json(msg='no config object retrievable from local.system.replset')
+
+            cfg['version'] += 1
+
+            if len(cfg['members']) == 1:
+                module.fail_json(msg="You can't delete last member of replica set")
+            for member in cfg['members']:
+                if host_name in member['host']:
+                    cfg['members'].remove(member)
+                else:
+                    fail_msg = "couldn't find member with hostname: {0} in replica set members list".format(host_name)
+                    module.fail_json(msg=fail_msg)
+        except (OperationFailure, AutoReconnect) as e:
+            if (dtdatetime.now() - start_time).seconds > timeout:
+                module.fail_json(msg='reached timeout while waiting for rs.reconfig(): %s' % str(e))
+            time.sleep(5)
+
+def load_mongocnf():
+    config = ConfigParser.RawConfigParser()
+    mongocnf = os.path.expanduser('~/.mongodb.cnf')
+
+    try:
+        config.readfp(open(mongocnf))
+        creds = dict(
+          user=config.get('client', 'user'),
+          password=config.get('client', 'pass')
+        )
+    except (ConfigParser.NoOptionError, IOError):
+        return False
+
+    return creds
+
+def wait_for_ok_and_master(module, connection_params, timeout = 180):
+    start_time = dtdatetime.now()
+    while True:
+        try:
+            client = MongoClient(**connection_params)
+            authenticate(client, connection_params["username"], connection_params["password"])
+
+            status = client.admin.command('replSetGetStatus', check=False)
+            if status['ok'] == 1 and status['myState'] == 1:
+                return
+
+        except ServerSelectionTimeoutError:
+            pass
+
+        client.close()
+
+        if (dtdatetime.now() - start_time).seconds > timeout:
+            module.fail_json(msg='reached timeout while waiting for rs.status() to become ok=1')
 
         time.sleep(1)
 
-def rs_alter(client, member, state, tries):
-    try:
-        # get replica set config
-        rs_config = rs_get_config(client)
-        member['_id'] = rs_get_next_member_id(rs_config)
+def authenticate(client, login_user, login_password):
+    if login_user is None and login_password is None:
+        mongocnf_creds = load_mongocnf()
+        if mongocnf_creds is not False:
+            login_user = mongocnf_creds['user']
+            login_password = mongocnf_creds['password']
+        elif login_password is None and login_user is not None:
+            module.fail_json(msg='when supplying login arguments, both login_user and login_password must be provided')
 
-        if state == 'present':
-            # check if given host is currently a member of replica set
-            current_member = rs_get_member(rs_config, member['host'])
-            if current_member is None:
-                rs_config = rs_add_member(rs_config, member)
-                rs_reconfigure(client, rs_config)
-                return True
-            else:
-                return False
-        elif state == 'absent':
-            # check if given host is currently a member of replica set
-            current_member = rs_get_member(rs_config, member['host'])
-            if current_member:
-                rs_config = rs_remove_member(rs_config, member)
-                rs_reconfigure(client, rs_config)
-                return True
-            else:
-                return False
-    except OperationFailure as error:
-        if error.code == 109:
-            time.sleep(random.randint(2, 8))
-        elif error.code == 103:
-            pass
-        else:
-            raise OperationError(error)
-        return rs_alter(client, member, state, tries+1)
+    if login_user is not None and login_password is not None:
+        client.admin.authenticate(login_user, login_password)
+
+# =========================================
+# Module execution.
+#
 
 def main():
     module = AnsibleModule(
         argument_spec = dict(
-            login_host      = dict(default='localhost'),
-            login_port      = dict(type='int', default=DEFAULT_PORT),
-            login_user      = dict(default=None),
-            login_password  = dict(default=None, no_log=True),
-            replset         = dict(default=None),
-            member          = dict(default=None),
-            arbiter_only    = dict(type='bool', choices=BOOLEANS, default='no'),
-            build_indexes   = dict(type='bool', choices=BOOLEANS, default='yes'),
-            hidden          = dict(type='bool', choices=BOOLEANS, default='no'),
-            priority        = dict(default='1.0'),
-            slave_delay     = dict(type='int', default='0'),
-            votes           = dict(type='int', default='1'),
-            state           = dict(required=True, choices=['initiated', 'reconf', 'present', 'absent']),
+            login_user=dict(default=None),
+            login_password=dict(default=None, no_log=True),
+            login_host=dict(default='localhost'),
+            login_port=dict(default='27017'),
+            login_database=dict(default="admin"),
+            replica_set=dict(default=None),
+            host_name=dict(default='localhost'),
+            host_port=dict(default='27017'),
+            host_type=dict(default='replica', choices=['replica','arbiter']),
+            ssl=dict(default=False, type='bool'),
+            ssl_cert_reqs=dict(default='CERT_REQUIRED', choices=['CERT_NONE', 'CERT_OPTIONAL', 'CERT_REQUIRED']),
+            build_indexes = dict(type='bool', default='yes'),
+            hidden = dict(type='bool', default='no'),
+            priority = dict(default='1.0'),
+            slave_delay = dict(type='int', default='0'),
+            votes = dict(type='int', default='1'),
+            state=dict(default='present', choices=['absent', 'present']),
         )
     )
 
     if not pymongo_found:
-        module.fail_json(msg='the python pymongo module is required')
+        module.fail_json(msg='the python pymongo (>= 3.2) module is required')
 
-    login_host      = module.params['login_host']
-    login_port      = module.params['login_port']
-    login_user      = module.params['login_user']
-    login_password  = module.params['login_password']
-    replset         = module.params['replset']
-    member_host     = module.params['member']
-    state           = module.params['state']
+    login_user = module.params['login_user']
+    login_password = module.params['login_password']
+    login_host = module.params['login_host']
+    login_port = module.params['login_port']
+    login_database = module.params['login_database']
+    replica_set = module.params['replica_set']
+    host_name = module.params['host_name']
+    host_port = module.params['host_port']
+    host_type = module.params['host_type']
+    ssl = module.params['ssl']
+    state = module.params['state']
+    priority = float(module.params['priority'])
 
-    if member_host is not None:
-        member_host = normalize_member_host(member_host)
+    replica_set_created = False
 
-    member = create_member(
-        host            = member_host,
-        arbiter_only    = module.params['arbiter_only'],
-        build_indexes   = module.params['build_indexes'],
-        hidden          = module.params['hidden'],
-        priority        = float(module.params['priority']),
-        slave_delay     = module.params['slave_delay'],
-        votes           = module.params['votes']
-    )
-
-    result = dict(changed=False)
-
-    # connect
-    client = None
     try:
-        client = MongoClient(login_host, login_port)
-    except ConnectionFailure as e:
-        module.fail_json(msg='unable to connect to database: %s' % e)
+        if replica_set is None:
+            module.fail_json(msg='replica_set parameter is required')
+        else:
+            connection_params = {
+                "host": login_host,
+                "port": int(login_port),
+                "username": login_user,
+                "password": login_password,
+                "authsource": login_database,
+                "serverselectiontimeoutms": 5000,
+                "replicaset": replica_set,
+            }
 
-    # authenticate
-    if login_user and login_password:
+        if ssl:
+            connection_params["ssl"] = ssl
+            connection_params["ssl_cert_reqs"] = getattr(ssl_lib, module.params['ssl_cert_reqs'])
+
+        client = MongoClient(**connection_params)
         authenticate(client, login_user, login_password)
+        client['admin'].command('replSetGetStatus')
 
-    if state == 'initiated':
-        # initiate only if not configured yet
-        is_master = rs_is_master(client)
-        if 'setName' not in is_master:
-            if member_host is None:
-                rs_initiate(client)
-            else:
-                if replset is None:
-                    module.fail_json(msg='replset must be specified when host is specified on state=initiated')
-                rs_config = {
-                    "_id": replset,
-                    "members": [member]
-                }
-                rs_config['members'][0]['_id'] = 0
-                rs_initiate(client, rs_config)
-            rs_wait_for_ok_and_primary(client)
-            result['changed'] = True
-    else:
-            result['changed'] = rs_alter(client, member, state, 0)
+    except ServerSelectionTimeoutError:
+        try:
+            connection_params = {
+                "host": login_host,
+                "port": int(login_port),
+                "username": login_user,
+                "password": login_password,
+                "authsource": login_database,
+                "serverselectiontimeoutms": 10000,
+            }
 
-    module.exit_json(**result)
+            if ssl:
+                connection_params["ssl"] = ssl
+                connection_params["ssl_cert_reqs"] = getattr(ssl_lib, module.params['ssl_cert_reqs'])
 
+            client = MongoClient(**connection_params)
+            authenticate(client, login_user, login_password)
+            if state == 'present':
+                new_host = { '_id': 0, 'host': "{0}:{1}".format(host_name, host_port) }
+                if priority != 1.0: new_host['priority'] = priority
+                config = { '_id': "{0}".format(replica_set), 'members': [new_host] }
+                client['admin'].command('replSetInitiate', config)
+                client.close()
+                wait_for_ok_and_master(module, connection_params)
+                replica_set_created = True
+                module.exit_json(changed=True, host_name=host_name, host_port=host_port, host_type=host_type)
+        except OperationFailure as e:
+            module.fail_json(msg='Unable to initiate replica set: %s' % str(e))
+    except ConnectionFailure as e:
+        module.fail_json(msg='unable to connect to database: %s' % str(e))
+
+    # reconnect again
+    client = MongoClient(**connection_params)
+    authenticate(client, login_user, login_password)
+    check_compatibility(module, client)
+    check_members(state, module, client, host_name, host_port, host_type)
+
+    if state == 'present':
+        if host_name is None and not replica_set_created:
+            module.fail_json(msg='host_name parameter required when adding new host into replica set')
+
+        try:
+            if not replica_set_created:
+                add_host(module, client, host_name, host_port, host_type,
+                        build_indexes   = module.params['build_indexes'],
+                        hidden          = module.params['hidden'],
+                        priority        = float(module.params['priority']),
+                        slave_delay     = module.params['slave_delay'],
+                        votes           = module.params['votes'])
+        except OperationFailure as e:
+            module.fail_json(msg='Unable to add new member to replica set: %s' % str(e))
+
+    elif state == 'absent':
+        try:
+            remove_host(module, client, host_name)
+        except OperationFailure as e:
+            module.fail_json(msg='Unable to remove member of replica set: %s' % str(e))
+
+    module.exit_json(changed=True, host_name=host_name, host_port=host_port, host_type=host_type)
+
+# import module snippets
 from ansible.module_utils.basic import *
 main()
