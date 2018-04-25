@@ -1,0 +1,53 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+  provider:
+    name: virtualbox
+lint:
+  name: yamllint
+platforms:
+  - name: mongo-01
+    box: bento/centos-7.4
+    provider_name: virtualbox
+    provider_memory: 4096
+    provider_cpus: 2
+    interfaces:
+      - network_name: private_network
+        type: static
+        ip: 192.168.56.10
+        auto_config: true
+  - name: mongo-02
+    box: bento/centos-7.4
+    provider_name: virtualbox
+    provider_memory: 4096
+    provider_cpus: 2
+    interfaces:
+      - network_name: private_network
+        type: static
+        ip: 192.168.56.11
+        auto_config: true
+  - name: mongo-03
+    box: bento/centos-7.4
+    provider_name: virtualbox
+    provider_memory: 4096
+    provider_cpus: 2
+    interfaces:
+      - network_name: private_network
+        type: static
+        ip: 192.168.56.12
+        auto_config: true
+provisioner:
+  name: ansible
+  playbooks:
+    converge: playbook.yml
+  lint:
+    name: ansible-lint
+scenario:
+  name: replica-set
+verifier:
+  name: testinfra
+  directory: ../../tests
+  lint:
+    name: flake8
