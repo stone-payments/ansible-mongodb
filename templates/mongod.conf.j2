@@ -3,8 +3,10 @@
 
 net:
   bindIp: {{ '127.0.0.1' if mongodb_safeMode else mongodb_conf_bindIp }}
+  {% if ("{{mongodb_install_major}}"+"."+"{{mongodb_install_minor}}") | version_compare("3.6", "<") -%}
   http:
     enabled: {{ mongodb_conf_httpInterface|to_nice_json|bool|lower }}
+  {% endif -%}    
   ipv6: {{ mongodb_conf_ipv6|to_nice_json|bool|lower }}
   maxIncomingConnections: {{ mongodb_conf_maxConns|int }}
   port: {{ mongodb_conf_port|int }}
