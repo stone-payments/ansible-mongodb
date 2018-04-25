@@ -38,7 +38,7 @@
     include: safeMode.yml
     vars:
       - mongodb_safeMode: true
-    when: mongodb_login_withPass|failed
+    when: mongodb_login_withPass is failed
 
   - name: configure mongodb admin user and password
     mongodb_user:
@@ -56,5 +56,5 @@
     include: safeMode.yml
     vars:
       - mongodb_safeMode: false
-    when: mongodb_login_withPass|failed
-  when: mongodb_login_withPass|failed or mongodb_login_withoutPass|failed
+    when: mongodb_login_withPass is failed
+  when: mongodb_login_withPass is failed or mongodb_login_withoutPass is failed
