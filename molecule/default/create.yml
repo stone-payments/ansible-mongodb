@@ -8,6 +8,7 @@
     molecule_ephemeral_directory: "{{ lookup('env', 'MOLECULE_EPHEMERAL_DIRECTORY') }}"
     molecule_scenario_directory: "{{ lookup('env', 'MOLECULE_SCENARIO_DIRECTORY') }}"
     molecule_yml: "{{ lookup('file', molecule_file) | molecule_from_yaml }}"
+    ansible_python_interpreter: "/usr/bin/python"
   tasks:
     - name: Create Dockerfiles from image names
       template:
