@@ -3,16 +3,10 @@
   hosts: all
   become: yes
   vars:
-    #mongodb_replica_votes: 1
-    mongodb_replSet_enabled: True
     mongodb_conf_bindIp: "0.0.0.0"
+    mongodb_replSet_enabled: True
     mongodb_replSet_name: "someReplica"
     mongodb_replSet_master: 192.168.56.10
-    mongodb_admin_password: "test"
-    mongodb_conf_auth: true
-    mongodb_conf_key: "testLonger"
-    #mongodb_replica_state: present
-    #mongodb_repSet_host_conn: "{{ansible_all_ipv4_addresses[1]}}"
     mongodb_replSet_isMaster: "{{ True if mongodb_replSet_master in ansible_all_ipv4_addresses else False }}"
 
   roles:
