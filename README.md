@@ -68,16 +68,22 @@ the configs on `defaults/main.yml` and they will be (hopefully) applied to your 
 
 ## Testing
 This role implements unit tests with [Molecule](https://molecule.readthedocs.io/) on Docker. Notice that we only
-support Molecule 2.0 or greater. You can install molecule with:
+support Molecule 2.0 or greater. You can install molecule locally with:
 ```bash
+virtualenv .venv
+.venv/bin/activate
 pip install molecule
 ```
 The Docker installation and configuration is out of scope.
 
-After having Molecule setup, you can run the tests with:
+After having Molecule setup within the virtualenv, you can run the tests with:
 ```bash
 molecule converge
 ```
+
+If you have a SELinux-enabled host, you must have the libselinux-python library installed. In Fedora 28, the RPM
+package is named python2-libselinux. There's a special addition in the Molecule playbook when delegating tasks to
+localhost to use the host's python instead of the virtualenv python in order to properly access the SELinux bindings.
 
 ## Contributing
 Just open a PR. We love PRs!
