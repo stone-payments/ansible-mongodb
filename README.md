@@ -98,9 +98,9 @@ Just open a PR. We love PRs!
 Here's some suggestions on what to do:
 
 * Support use of distro-packaged MongoDB.
-* Support Ubuntu Zesty and Artful.
 * Write further standalone tests with serverspec or testinfra.
-* Write a test case for the replica set.
+* Improve the test case for the replica set.
+* Make the replica-set test case run on docker.
 
 ## License
 This role is distributed under the MIT license.
