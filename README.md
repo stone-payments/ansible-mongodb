@@ -27,7 +27,7 @@ Further distros may be added upon request, as long as the requirements are met.
 ### Quickstart
 There's absolute no variable needed to setup a basic, passwordless, loopback-only, standalone MongoDB setup. Just
 include it in a play:
-```
+```yaml
 - name: install mongodb
   hosts: all
   roles: stone-payments.mongodb
@@ -36,7 +36,7 @@ include it in a play:
 ### Replica set setup
 In order to build a replica set, you need to inform the master that he is a master, and a replica on which master to
 connect to. You can do all this with the following excerpt:
-```
+```yaml
 - name: install mongodb replica set
   host: all
   roles: stone-payments.mongodb
@@ -49,7 +49,7 @@ connect to. You can do all this with the following excerpt:
 ### Logging
 You can set any [systemLog](https://docs.mongodb.com/manual/reference/configuration-options/#systemlog-options)
 option by providing `mongodb_conf_logging` dictionary:
-```
+```yaml
 - name: install mongodb with network debug logging
   host: all
   roles: stone-payments.mongodb
@@ -70,7 +70,7 @@ the configs on `defaults/main.yml` and they will be (hopefully) applied to your 
 This role implements unit tests with [Molecule](https://molecule.readthedocs.io/) on Docker. Notice that we only
 support Molecule 2.0 or greater. You can install Molecule and the Docker interaction library inside a virtual
 environment with the following commands. Notice that we need docker-py both inside and outside the virtualenv.
-```bash
+```sh
 sudo pip install docker-py
 virtualenv .venv
 .venv/bin/activate
@@ -82,12 +82,12 @@ If you have a SELinux-enabled host, you must also have the libselinux-python lib
 addition in the Molecule playbook when delegating tasks to localhost to use the host's python interpreter instead of
 the virtualenv python in order to properly access the SELinux bindings. You can install this package both on Fedora and
 CentOS with:
-```bash
+```sh
 sudo yum install python2-libselinux
 ```
 
 After having Molecule setup within the virtualenv, you can run the tests with:
-```bash
+```sh
 molecule converge
 ```
 
