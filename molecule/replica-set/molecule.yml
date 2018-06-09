@@ -9,10 +9,10 @@ lint:
   name: yamllint
 platforms:
   - name: mongo-01
-    box: bento/centos-7.5
+    box: bento/centos-7.4
     provider_name: virtualbox
-    provider_memory: 4096
-    provider_cpus: 2
+    provider_memory: 1024
+    provider_cpus: 1
     interfaces:
       - network_name: private_network
         type: static
@@ -21,18 +21,18 @@ platforms:
   - name: mongo-02
     box: bento/ubuntu-16.04
     provider_name: virtualbox
-    provider_memory: 4096
-    provider_cpus: 2
+    provider_memory: 1024
+    provider_cpus: 1
     interfaces:
       - network_name: private_network
         type: static
         ip: 192.168.56.11
         auto_config: true
   - name: mongo-03
-    box: bento/ubuntu-16.04
+    box: bento/centos-7.5
     provider_name: virtualbox
-    provider_memory: 4096
-    provider_cpus: 2
+    provider_memory: 1024
+    provider_cpus: 1
     interfaces:
       - network_name: private_network
         type: static

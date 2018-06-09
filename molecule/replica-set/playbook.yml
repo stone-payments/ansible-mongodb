@@ -8,6 +8,7 @@
     mongodb_replSet_name: "someReplica"
     mongodb_replSet_master: 192.168.56.10
     mongodb_replSet_isMaster: "{{ True if mongodb_replSet_master in ansible_all_ipv4_addresses else False }}"
+    #mongodb_replSet_key: "testLonger"
 
   roles:
    - role: stone-payments.epel

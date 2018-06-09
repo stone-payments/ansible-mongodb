@@ -42,7 +42,7 @@
     mode: "0755"
   with_items:
     - path: "{{ mongodb_conf_file | dirname }}"
-    - path: "{{ mongodb_conf_keyFile | dirname }}"
+    - path: "{{ mongodb_replSet_keyFile | dirname }}"
   notify: mongodb restart
 
 - name: configure SELinux for MongoDB
