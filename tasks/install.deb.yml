@@ -1,7 +1,10 @@
 - name: Import the key for the official MongoDB repository.
   apt_key:
     keyserver: hkp://keyserver.ubuntu.com:80
-    id: 0C49F3730359A14518585931BC711F9BA15703C6
+    id: "{{ item }}"
+  with_items:
+    - 0C49F3730359A14518585931BC711F9BA15703C6 #MongoDB 3.4
+    - 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5 #MongoDB 3.6
 
 - name: Setup Debian MongoDB {{ mongodb_install_major }}.{{ mongodb_install_minor }} repository
   copy:
