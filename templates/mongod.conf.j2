@@ -3,8 +3,10 @@
 
 net:
   bindIp: {{ '127.0.0.1' if mongodb_safeMode else mongodb_conf_bindIp }}
+{% if mongodb_install_major <= 3 and mongodb_install_minor < 6 %}
   http:
     enabled: {{ mongodb_conf_httpInterface|to_nice_json|bool|lower }}
+{% endif %}
   ipv6: {{ mongodb_conf_ipv6|to_nice_json|bool|lower }}
   maxIncomingConnections: {{ mongodb_conf_maxConns|int }}
   port: {{ mongodb_conf_port|int }}
@@ -13,18 +15,18 @@ processManagement:
   fork: false
   pidFilePath: {{ mongodb_conf_pidFile }}
 
-{% if mongodb_replSet_enabled and not mongodb_safeMode -%}
+{% if mongodb_replSet_enabled and not mongodb_safeMode %}
 replication:
   oplogSizeMB: {{ mongodb_conf_oplogSize | int }}
   replSetName: {{ mongodb_replSet_name }}
 {% endif %}
 
-{% if mongodb_conf_auth and not mongodb_safeMode -%}
+{% if mongodb_conf_auth and not mongodb_safeMode %}
 security:
   authorization: {{ 'enabled' if mongodb_conf_auth else 'disabled' }}
-  {% if mongodb_replSet_enabled and mongodb_conf_auth -%}
+{% if mongodb_replSet_enabled and mongodb_conf_auth %}
   keyFile: {{ mongodb_conf_keyFile }}
-  {% endif %}
+{% endif %}
 {% endif %}
 
 storage:

@@ -2,7 +2,7 @@
 mongodb_install_enabled: true
 mongodb_install_selinux: true
 mongodb_install_major: 3
-mongodb_install_minor: 4
+mongodb_install_minor: 6
 mongodb_install_patch: "*"
 
 mongodb_daemon_bin: /usr/bin/mongod
