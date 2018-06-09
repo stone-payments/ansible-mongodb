@@ -15,7 +15,6 @@ To conserve development efforts, we decided that a supported distro should:
 Therefore, the supported systems list is currently:
 
 * Enterprise Linux (both CentOS and RHEL)
-  * 7.2
   * 7.3
   * 7.4
 * Ubuntu
