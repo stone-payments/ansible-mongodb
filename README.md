@@ -68,22 +68,28 @@ the configs on `defaults/main.yml` and they will be (hopefully) applied to your 
 
 ## Testing
 This role implements unit tests with [Molecule](https://molecule.readthedocs.io/) on Docker. Notice that we only
-support Molecule 2.0 or greater. You can install molecule locally with:
+support Molecule 2.0 or greater. You can install Molecule and the Docker interaction library inside a virtual
+environment with the following commands. Notice that we need docker-py both inside and outside the virtualenv.
 ```bash
+sudo pip install docker-py
 virtualenv .venv
 .venv/bin/activate
-pip install molecule
+pip install molecule docker-py
 ```
 The Docker installation and configuration is out of scope.
+
+If you have a SELinux-enabled host, you must also have the libselinux-python library installed. There's a special
+addition in the Molecule playbook when delegating tasks to localhost to use the host's python interpreter instead of
+the virtualenv python in order to properly access the SELinux bindings. You can install this package both on Fedora and
+CentOS with:
+```bash
+sudo yum install python2-libselinux
+```
 
 After having Molecule setup within the virtualenv, you can run the tests with:
 ```bash
 molecule converge
 ```
-
-If you have a SELinux-enabled host, you must have the libselinux-python library installed. In Fedora 28, the RPM
-package is named python2-libselinux. There's a special addition in the Molecule playbook when delegating tasks to
-localhost to use the host's python instead of the virtualenv python in order to properly access the SELinux bindings.
 
 ## Contributing
 Just open a PR. We love PRs!
@@ -92,9 +98,9 @@ Just open a PR. We love PRs!
 Here's some suggestions on what to do:
 
 * Support use of distro-packaged MongoDB.
-* Support Ubuntu Zesty and Artful.
 * Write further standalone tests with serverspec or testinfra.
-* Write a test case for the replica set.
+* Improve the test case for the replica set.
+* Make the replica-set test case run on docker.
 
 ## License
 This role is distributed under the MIT license.
