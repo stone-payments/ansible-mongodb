@@ -42,10 +42,25 @@ connect to. You can do all this with the following excerpt:
   roles: stone-payments.mongodb
   vars:
     mongodb_conf_bindIp: "0.0.0.0"
+    mongodb_replSet_enabled: true
     mongodb_replSet_name: "someReplicaSetName"
-    mongodb_replSet_master: "1.2.3.4"
-    mongodb_replSet_isMaster: "{{ true if mongodb_replSet_master in ansible_all_ipv4_addresses else false }}"
+    mongodb_replSet_master: "1.2.3.4" #must be an IP address
+    mongodb_replSet_key: "someLongKey" #optional, cross-replica authentication key
+    mongodb_replSet_member: "{{ ansible_eth1['ipv4']['address'] }}" #optional, specify a different IF for replication
 ```
+
+### Authentication
+You can enable authentication and create an admin account the following way:
+```yaml
+- name: install mongodb with authentication
+  hosts: all
+  roles: stone-payments.mongodb
+  vars:
+    mongodb_conf_auth: true
+    mongodb_admin_user: "admin"
+    mongodb_admin_password: "somePassword"
+```
+
 ### Logging
 You can set any [systemLog](https://docs.mongodb.com/manual/reference/configuration-options/#systemlog-options)
 option by providing `mongodb_conf_logging` dictionary:
@@ -88,8 +103,10 @@ sudo yum install python2-libselinux
 
 After having Molecule setup within the virtualenv, you can run the tests with:
 ```sh
-molecule converge
+molecule converge [-s scenario_name]
 ```
+Where `scenario_name` is the name of a test case under `molecule`. The default test case is run if no parameter is
+passed.
 
 ## Contributing
 Just open a PR. We love PRs!
@@ -100,7 +117,6 @@ Here's some suggestions on what to do:
 * Support use of distro-packaged MongoDB.
 * Write further standalone tests with serverspec or testinfra.
 * Improve the test case for the replica set.
-* Make the replica-set test case run on docker.
 
 ## License
 This role is distributed under the MIT license.
