@@ -32,7 +32,6 @@ mongodb_admin_password: "adminPassword"
 mongodb_replSet_enabled: false
 mongodb_replSet_name: ""
 mongodb_replSet_master: "127.0.0.1"
-mongodb_replSet_isMaster: false
 mongodb_replSet_member: "{{ ansible_default_ipv4.address }}"
 mongodb_replSet_key: ""                                # Keyfile content
 mongodb_replSet_keyFile: /etc/mongodb/mongod.key       # Keyfile path

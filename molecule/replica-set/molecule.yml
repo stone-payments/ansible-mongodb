@@ -2,52 +2,50 @@
 dependency:
   name: galaxy
 driver:
-  name: vagrant
-  provider:
-    name: virtualbox
+  name: docker
 lint:
   name: yamllint
 platforms:
-  - name: mongo-01
-    box: bento/centos-7.4
-    provider_name: virtualbox
-    provider_memory: 1024
-    provider_cpus: 1
-    interfaces:
-      - network_name: private_network
-        type: static
-        ip: 192.168.56.10
-        auto_config: true
-  - name: mongo-02
-    box: bento/ubuntu-16.04
-    provider_name: virtualbox
-    provider_memory: 1024
-    provider_cpus: 1
-    interfaces:
-      - network_name: private_network
-        type: static
-        ip: 192.168.56.11
-        auto_config: true
-  - name: mongo-03
-    box: bento/centos-7.5
-    provider_name: virtualbox
-    provider_memory: 1024
-    provider_cpus: 1
-    interfaces:
-      - network_name: private_network
-        type: static
-        ip: 192.168.56.12
-        auto_config: true
+  - name: mongo1
+    image: centos:7.5.1804
+    command: /usr/sbin/init
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    networks:
+      - name: molecule
+        ipv4_address: 192.168.56.11
+        aliases:
+          - mongo1
+  - name: mongo2
+    image: centos:7.4.1708
+    command: /usr/sbin/init
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    networks:
+      - name: molecule
+        ipv4_address: 192.168.56.12
+        aliases:
+          - mongo2
+  - name: mongo3
+    image: ubuntu:xenial
+    command: /sbin/init
+    privileged: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    networks:
+      - name: molecule
+        ipv4_address: 192.168.56.13
+        aliases:
+          - mongo3
 provisioner:
   name: ansible
-  playbooks:
-    converge: playbook.yml
   lint:
     name: ansible-lint
 scenario:
   name: replica-set
 verifier:
   name: testinfra
-  directory: ../../tests
   lint:
     name: flake8

@@ -14,3 +14,4 @@ before_install:
   - molecule dependency
 script:
   - molecule converge -s default
+  - molecule converge -s replica-set
