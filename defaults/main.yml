@@ -12,7 +12,6 @@ mongodb_daemon_group: mongod
 
 mongodb_conf_file: /etc/mongodb/mongod.conf            # Configuration file path
 mongodb_conf_pidFile: /var/run/mongod/mongod.pid       # PID file path
-mongodb_conf_keyFile: /etc/mongodb/mongod.key          # Keyfile path
 mongodb_conf_dbPath: /var/lib/mongo                    # Directory for datafiles
 mongodb_conf_dbEngine: wiredTiger                      # Storage Engine
 mongodb_conf_auth: false                               # Client authentication
@@ -26,7 +25,6 @@ mongodb_conf_logging:                                  # systemLog settings dict
 mongodb_conf_maxConns: 800                             # Max number of simultaneous connections
 mongodb_conf_port: 27017                               # Specify TCP port number
 mongodb_conf_oplogSize: 1024
-mongodb_conf_key: ""                                   # Keyfile content
 
 mongodb_admin_user: "admin"
 mongodb_admin_password: "adminPassword"
@@ -34,8 +32,9 @@ mongodb_admin_password: "adminPassword"
 mongodb_replSet_enabled: false
 mongodb_replSet_name: ""
 mongodb_replSet_master: "127.0.0.1"
-mongodb_replSet_isMaster: false
 mongodb_replSet_member: "{{ ansible_default_ipv4.address }}"
+mongodb_replSet_key: ""                                # Keyfile content
+mongodb_replSet_keyFile: /etc/mongodb/mongod.key       # Keyfile path
 
 mongodb_shell_run: false
 mongodb_shell_commands: {}                             # Define mongo shell commands to run

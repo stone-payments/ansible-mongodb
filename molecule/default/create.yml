@@ -32,6 +32,16 @@
       with_items: "{{ platforms.results }}"
       when: platforms.changed or docker_images.results | map(attribute='images') | select('equalto', []) | list | count >= 0
 
+    - name: Create test network
+      docker_network:
+        name: molecule
+        driver: bridge
+        ipam_options:
+          subnet: '192.168.56.0/24'
+          gateway: '192.168.56.1'
+          iprange: '192.168.56.128/25'
+        state: present
+
     - name: Create molecule instance(s)
       docker_container:
         name: "{{ item.name }}"
@@ -44,4 +54,5 @@
         privileged: "{{ item.privileged | default(omit) }}"
         volumes: "{{ item.volumes | default(omit) }}"
         capabilities: "{{ item.capabilities | default(omit) }}"
+        networks: "{{ item.networks | default(omit) }}"
       with_items: "{{ molecule_yml.platforms }}"

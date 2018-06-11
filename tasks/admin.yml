@@ -1,5 +1,5 @@
 ---
-- name: ensure admin login works with password
+- name: ensure admin login works
   mongodb_user:
     database: admin
     login_user: "{{ mongodb_admin_user }}"
@@ -15,30 +15,13 @@
   ignore_errors: true
   when: mongodb_conf_auth == true
   changed_when: false
-  register: mongodb_login_withPass
-
-- name: ensure admin login works without password
-  mongodb_user:
-    database: admin
-    user: "{{ mongodb_admin_user }}"
-    password: "{{ mongodb_admin_password }}"
-    roles:
-      - db: admin
-        role: root
-      - db: local
-        role: read
-    state: present
-  ignore_errors: true
-  when: mongodb_conf_auth == false
-  changed_when: false
-  register: mongodb_login_withoutPass
+  register: mongodb_login
 
 - block:
   - name: enable safeMode
     include: safeMode.yml
     vars:
       - mongodb_safeMode: true
-    when: mongodb_login_withPass is failed
 
   - name: configure mongodb admin user and password
     mongodb_user:
@@ -56,5 +39,4 @@
     include: safeMode.yml
     vars:
       - mongodb_safeMode: false
-    when: mongodb_login_withPass is failed
-  when: mongodb_login_withPass is failed or mongodb_login_withoutPass is failed
+  when: mongodb_login is failed

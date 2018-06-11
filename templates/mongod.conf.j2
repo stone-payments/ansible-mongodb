@@ -21,11 +21,16 @@ replication:
   replSetName: {{ mongodb_replSet_name }}
 {% endif %}
 
-{% if mongodb_conf_auth and not mongodb_safeMode %}
+{% if not mongodb_safeMode %}
+{% if mongodb_conf_auth or mongodb_replSet_key != "" %}
 security:
+{% endif %}
+{% if mongodb_conf_auth %}
   authorization: {{ 'enabled' if mongodb_conf_auth else 'disabled' }}
-{% if mongodb_replSet_enabled and mongodb_conf_auth %}
-  keyFile: {{ mongodb_conf_keyFile }}
+{% endif %}
+{% if mongodb_replSet_key != "" %}
+  clusterAuthMode: keyFile
+  keyFile: {{ mongodb_replSet_keyFile }}
 {% endif %}
 {% endif %}
 

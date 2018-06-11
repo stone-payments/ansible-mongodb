@@ -1,23 +1,46 @@
 ---
-- name: initiate replica set
-  mongodb_replica_set:
-    state: initiated
-    replset: "{{ mongodb_replSet_name }}"
-    login_host: "127.0.0.1"
-    login_port: "{{ mongodb_conf_port }}"
-    login_user: "{{ mongodb_admin_user }}"
-    login_password: "{{ mongodb_admin_password }}"
-    priority: "501"
-    member: "{{ mongodb_replSet_member }}:{{ mongodb_conf_port }}"
-  when: mongodb_replSet_isMaster
+- block:
+  - name: initiate replica set
+    mongodb_replica_set:
+      state: initiated
+      replset: "{{ mongodb_replSet_name }}"
+      login_host: "127.0.0.1"
+      login_port: "{{ mongodb_conf_port }}"
+      priority: "501"
+      member: "{{ mongodb_replSet_member }}:{{ mongodb_conf_port }}"
+    when: mongodb_replSet_isMaster
 
-- name: connect to master
-  mongodb_replica_set:
-    state: present
-    replset: "{{ mongodb_replSet_name }}"
-    login_host: "{{ mongodb_replSet_master }}"
-    login_port: "{{ mongodb_conf_port }}"
-    login_user: "{{ mongodb_admin_user }}"
-    login_password: "{{ mongodb_admin_password }}"
-    member: "{{ mongodb_replSet_member }}:{{ mongodb_conf_port }}"
-  when: not mongodb_replSet_isMaster
+  - name: connect to master
+    mongodb_replica_set:
+      state: present
+      replset: "{{ mongodb_replSet_name }}"
+      login_host: "{{ mongodb_replSet_master }}"
+      login_port: "{{ mongodb_conf_port }}"
+      member: "{{ mongodb_replSet_member }}:{{ mongodb_conf_port }}"
+    when: not mongodb_replSet_isMaster
+  when: not mongodb_conf_auth
+
+- block:
+  - name: initiate replica set (authenticated)
+    mongodb_replica_set:
+      state: initiated
+      replset: "{{ mongodb_replSet_name }}"
+      login_host: "127.0.0.1"
+      login_port: "{{ mongodb_conf_port }}"
+      login_user: "{{ mongodb_admin_user }}"
+      login_password: "{{ mongodb_admin_password }}"
+      priority: "501"
+      member: "{{ mongodb_replSet_member }}:{{ mongodb_conf_port }}"
+    when: mongodb_replSet_isMaster
+
+  - name: connect to master (authenticated)
+    mongodb_replica_set:
+      state: present
+      replset: "{{ mongodb_replSet_name }}"
+      login_host: "{{ mongodb_replSet_master }}"
+      login_port: "{{ mongodb_conf_port }}"
+      login_user: "{{ mongodb_admin_user }}"
+      login_password: "{{ mongodb_admin_password }}"
+      member: "{{ mongodb_replSet_member }}:{{ mongodb_conf_port }}"
+    when: not mongodb_replSet_isMaster
+  when: mongodb_conf_auth
