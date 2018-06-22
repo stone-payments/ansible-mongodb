@@ -92,6 +92,10 @@ the following options (which are specific to the firewall solution you're utiliz
 ```
 You may also suppress firewall config by setting `mongodb_install_firewall: false`.
 
+### Linux Security Modules
+This role will configure LSMs by default (currently only SELinux is supported). You may disable this by setting:
+`mongodb_install_lsm: false`.
+
 ### Other configs
 I believe almost every other config is self-explanatory or directly related to a MongoDB core feature. Simply override
 the configs on `defaults/main.yml` and they will be (hopefully) applied to your system.

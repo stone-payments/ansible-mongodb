@@ -44,7 +44,3 @@
     - path: "{{ mongodb_conf_file | dirname }}"
     - path: "{{ mongodb_replSet_keyFile | dirname }}"
   notify: mongodb restart
-
-- name: configure SELinux for MongoDB
-  include: selinux.yml
-  when: mongodb_install_selinux and ansible_selinux and ansible_selinux.status == "enabled"
