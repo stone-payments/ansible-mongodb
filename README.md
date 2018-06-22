@@ -77,6 +77,21 @@ option by providing `mongodb_conf_logging` dictionary:
       destination: file
       path: /var/log/mongodb/mongod.log
 ```
+
+### Firewall
+This rule will configure either ufw or firewalld to enable incoming connections by default. You may customize this with
+the following options (which are specific to the firewall solution you're utilizing):
+```yaml
+- name: install mongodb with custom firewall settings
+  hosts: all
+  roles: stone-payments.mongodb
+  vars:
+    mongodb_firewall_zone: "public" #firewalld only
+    mongodb_firewall_interface: "eth0" #ufw only
+    mongodb_firewall_source: "192.168.0.0/24" #ufw only
+```
+You may also suppress firewall config by setting `mongodb_install_firewall: false`.
+
 ### Other configs
 I believe almost every other config is self-explanatory or directly related to a MongoDB core feature. Simply override
 the configs on `defaults/main.yml` and they will be (hopefully) applied to your system.
