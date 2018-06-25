@@ -1,0 +1,32 @@
+---
+- name: test if firewalld is present and enabled
+  shell: systemctl show firewalld --property=ActiveState
+  changed_when: false
+  failed_when: false
+  register: firewalld_ActiveState
+
+- name: test if ufw is present and enabled
+  shell: systemctl show ufw --property=ActiveState
+  changed_when: false
+  failed_when: false
+  register: ufw_ActiveState
+
+- block:
+    - name: configure firewalld for client and replica connections
+      firewalld:
+        port: "{{ mongodb_conf_port }}/tcp"
+        zone: "{{ mongodb_firewall_zone | default(omit) }}"
+        permanent: true
+        state: enabled
+  when: firewalld_ActiveState.stdout == "ActiveState=active"
+
+- block:
+    - name: configure ufw for client and replica connections
+      ufw:
+        rule: allow
+        port: "{{ mongodb_conf_port }}"
+        proto: tcp
+        interface: "{{ mongodb_firewall_interface | default(omit) }}"
+        source: "{{ mongodb_firewall_source | default(omit) }}"
+        state: enabled
+  when: ufw_ActiveState.stdout == "ActiveState=active"

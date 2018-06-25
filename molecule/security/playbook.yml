@@ -1,0 +1,10 @@
+---
+- name: Converge
+  hosts: all
+  become: true
+  roles:
+    - role: stone-payments.epel
+      when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+    - role: stone-payments.mongodb
+  vars:
+    mongodb_conf_bindIp: "0.0.0.0"

@@ -14,12 +14,24 @@
   - name: install MongoDB (RedHat)
     include: install.rpm.yml
     when: ansible_os_family == 'RedHat'
+
   - name: install MongoDB (Debian/Ubuntu)
     include: install.deb.yml
     when: ansible_os_family == 'Debian'
+
   - name: common installation steps
     include: install.common.yml
-  when: mongodb_install_enabled
+
+  - name: configure Linux Security Modules for MongoDB
+    include: lsm.yml
+    when: mongodb_install_lsm
+    tags: mongodb_install_lsm
+
+  - name: configure firewall for MongoDB
+    include: firewall.yml
+    when: mongodb_install_firewall and mongodb_conf_bindIp != "127.0.0.1"
+    tags: mongodb_install_firewall
+  when: mongodb_install
   tags: mongodb_install
 
 - name: configure MongoDB daemon

@@ -77,14 +77,46 @@ option by providing `mongodb_conf_logging` dictionary:
       destination: file
       path: /var/log/mongodb/mongod.log
 ```
+
+### Firewall
+This rule will configure either ufw or firewalld to enable incoming connections by default. You may customize this with
+the following options (which are specific to the firewall solution you're utilizing):
+```yaml
+- name: install mongodb with custom firewall settings
+  hosts: all
+  roles: stone-payments.mongodb
+  vars:
+    mongodb_firewall_zone: "public" #firewalld only
+    mongodb_firewall_interface: "eth0" #ufw only
+    mongodb_firewall_source: "192.168.0.0/24" #ufw only
+```
+You may also suppress firewall config by setting `mongodb_install_firewall: false`.
+
+### Linux Security Modules
+This role will configure LSMs by default (currently only SELinux is supported). You may disable this by setting:
+`mongodb_install_lsm: false`.
+
 ### Other configs
 I believe almost every other config is self-explanatory or directly related to a MongoDB core feature. Simply override
 the configs on `defaults/main.yml` and they will be (hopefully) applied to your system.
 
 ## Testing
-This role implements unit tests with [Molecule](https://molecule.readthedocs.io/) on Docker. Notice that we only
-support Molecule 2.0 or greater. You can install Molecule and the Docker interaction library inside a virtual
-environment with the following commands. Notice that we need docker-py both inside and outside the virtualenv.
+This role implements most unit tests with [Molecule](https://molecule.readthedocs.io/) on Docker. Notice that we only
+support Molecule 2.0 or greater. Some tests are implemented on Vagrant with VirtualBox so we can test aspects that
+require a full-blown VM. However, for the tests that require Vagrant, there's no CI integration since there isn't a
+public CI that supports nested virtualization.
+
+The following scenarios are present:
+
+| Scenario Name | Driver  | Description                                   |
+| ------------- | ------- | --------------------------------------------- |
+| `default`     | docker  | Basic role sanity tests in a individual setup |
+| `replica-set` | docker  | Mixed distro setup in a replica set           |
+| `security`    | vagrant | Full-blown VM to test LSM and firewall config |
+
+### Docker environment setup
+You can install Molecule and the Docker interaction library inside a virtual environment with the following commands.
+Notice that we need docker-py both inside and outside the virtualenv.
 ```sh
 sudo pip install docker-py
 virtualenv .venv
@@ -101,6 +133,16 @@ CentOS with:
 sudo yum install python2-libselinux
 ```
 
+### Vagrant environment setup
+You can install Molecule inside a virtual environment with the following commands:
+```sh
+virtualenv .venv
+.venv/bin/activate
+pip install molecule
+```
+The Vagrant and VirtualBox installation and configuration is out of scope.
+
+### Running the test
 After having Molecule setup within the virtualenv, you can run the tests with:
 ```sh
 molecule converge [-s scenario_name]
