@@ -1,8 +1,10 @@
 ---
 - name: Prepare
   hosts: all
-  gather_facts: False
   become: true
+  roles:
+    - role: stone-payments.epel
+      when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
   tasks:
     - name: test if firewalld unit is loaded
       shell: systemctl show firewalld --property=LoadState

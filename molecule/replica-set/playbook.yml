@@ -10,6 +10,4 @@
     #mongodb_replSet_key: "testLonger"
 
   roles:
-   - role: stone-payments.epel
-     when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
    - role: stone-payments.mongodb
