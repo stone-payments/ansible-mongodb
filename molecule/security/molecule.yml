@@ -1,0 +1,37 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: vagrant
+  provider:
+    name: virtualbox
+lint:
+  name: yamllint
+platforms:
+  - name: centos7-5
+    box: bento/centos-7.5
+    provider_name: virtualbox
+    provider_memory: 512
+    provider_cpus: 1
+    ansible_groups:
+        - group1
+  - name: xenial
+    box: bento/ubuntu-16.04
+    provider_name: virtualbox
+    provider_memory: 512
+    provider_cpus: 1
+    ansible_groups:
+        - group1
+provisioner:
+  name: ansible
+  playbooks:
+    converge: playbook.yml
+  lint:
+    name: ansible-lint
+scenario:
+  name: security
+verifier:
+  name: testinfra
+  directory: ../../tests/default
+  lint:
+    name: flake8
