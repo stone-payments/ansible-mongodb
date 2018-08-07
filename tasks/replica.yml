@@ -7,6 +7,7 @@
       login_host: "127.0.0.1"
       login_port: "{{ mongodb_conf_port }}"
       priority: "501"
+      votes: "{{ mongodb_replSet_votes }}"
       member: "{{ mongodb_replSet_member }}:{{ mongodb_conf_port }}"
     when: mongodb_replSet_isMaster
 
@@ -16,6 +17,9 @@
       replset: "{{ mongodb_replSet_name }}"
       login_host: "{{ mongodb_replSet_master }}"
       login_port: "{{ mongodb_conf_port }}"
+      priority: "{{ mongodb_replSet_priority | default(omit) }}"
+      arbiter_only: "{{ mongodb_replSet_arbiter }}"
+      votes: "{{ mongodb_replSet_votes }}"
       member: "{{ mongodb_replSet_member }}:{{ mongodb_conf_port }}"
     when: not mongodb_replSet_isMaster
   when: not mongodb_conf_auth
@@ -30,6 +34,7 @@
       login_user: "{{ mongodb_admin_user }}"
       login_password: "{{ mongodb_admin_password }}"
       priority: "501"
+      votes: "{{ mongodb_replSet_votes }}"
       member: "{{ mongodb_replSet_member }}:{{ mongodb_conf_port }}"
     when: mongodb_replSet_isMaster
 
@@ -41,6 +46,9 @@
       login_port: "{{ mongodb_conf_port }}"
       login_user: "{{ mongodb_admin_user }}"
       login_password: "{{ mongodb_admin_password }}"
+      priority: "{{ mongodb_replSet_priority | default(omit) }}"
+      arbiter_only: "{{ mongodb_replSet_arbiter }}"
+      votes: "{{ mongodb_replSet_votes }}"
       member: "{{ mongodb_replSet_member }}:{{ mongodb_conf_port }}"
     when: not mongodb_replSet_isMaster
   when: mongodb_conf_auth
