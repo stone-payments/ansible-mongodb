@@ -1,6 +1,6 @@
 stone-payments.mongodb
 ============
-[![Build Status](https://travis-ci.org/stone-payments/ansible-mongodb.svg?branch=feat%2Fmolecule)](https://travis-ci.org/stone-payments/ansible-mongodb)
+[![Build Status](https://travis-ci.org/stone-payments/ansible-mongodb.svg?branch=master)](https://travis-ci.org/stone-payments/ansible-mongodb)
 
 Role for Ansible which manages MongoDB in a standalone setup or replica set.
 
