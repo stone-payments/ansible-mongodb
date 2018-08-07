@@ -47,6 +47,7 @@ connect to. You can do all this with the following excerpt:
     mongodb_replSet_master: "1.2.3.4" #must be an IP address
     mongodb_replSet_key: "someLongKey" #optional, cross-replica authentication key
     mongodb_replSet_member: "{{ ansible_eth1['ipv4']['address'] }}" #optional, specify a different IF for replication
+    mongodb_replSet_arbiter: "{{ true if inventory_hostname == 'hostThatIsArbiter' else false }}"
 ```
 
 ### Authentication
