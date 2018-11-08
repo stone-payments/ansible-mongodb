@@ -1,14 +1,4 @@
 ---
-- name: configure mongodb replication key
-  template:
-    src: "mongod.key.j2"
-    dest: "{{ mongodb_conf_keyFile }}"
-    owner: "{{ mongodb_daemon_user }}"
-    group: "{{ mongodb_daemon_group }}"
-    mode: "0600"
-  when: mongodb_conf_auth
-  notify: mongodb restart
-
 - name: configure mongodb daemon
   template:
     src: "{{ item.src }}"
