@@ -24,6 +24,7 @@
   rpm_key:
     state: present
     key: "https://www.mongodb.org/static/pgp/server-{{ mongodb_install_major }}.{{ mongodb_install_minor }}.asc"
+  when: mongodb_enable_yum_repository
 
 - name: install MongoDB {{ mongodb_install_major }}.{{ mongodb_install_minor }} repo
   yum_repository:
@@ -32,6 +33,7 @@
     baseurl: "https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/{{ mongodb_install_major }}.{{ mongodb_install_minor }}/$basearch/"
     gpgcheck: true
     state: present
+  when: mongodb_enable_yum_repository
 
 - name: install MongoDB package
   yum: name={{item}} state=present
