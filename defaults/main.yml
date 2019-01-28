@@ -47,3 +47,5 @@ mongodb_shell_commands: {}                             # Define mongo shell comm
                                                        #           - db.setProfilingLevel(1, 50)
 
 mongodb_safeMode: false
+mongodb_enable_yum_repository: true
+mongodb_pip_index_url: ""
