@@ -3,14 +3,14 @@
     name: pymongo
     state: latest
   when:  mongodb_pip_index_url == ""
-    
+
 - name: install pymongo from custom index
   pip:
     name: pymongo
     state: latest
     extra_args: -i "{{ mongodb_pip_index_url }}"
-  when:  mongodb_pip_index_url|default("") != "" 
-  
+  when:  mongodb_pip_index_url|default("") != ""
+
 - name: remove old broken sysV script
   file:
     path: "/etc/rc.d/init.d/mongod"
@@ -36,9 +36,12 @@
     owner: "{{ mongodb_daemon_user }}"
     group: "{{ mongodb_daemon_group }}"
     mode: "0755"
+    recurse: true
   with_items:
     - path: "{{ mongodb_conf_dbPath }}"
     - path: "{{ mongodb_conf_pidFile | dirname }}"
+    - path: "{{ mongodb_conf_logging.path | default('') | dirname or None }}"
+  when: item.path | default(False)
   notify: mongodb restart
 
 - name: create mongodb read-only directories
