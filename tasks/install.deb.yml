@@ -25,3 +25,4 @@
     - numactl
     - python-pip
     - python3-pip
+  ignore_errors: "{{ ansible_check_mode }}"
