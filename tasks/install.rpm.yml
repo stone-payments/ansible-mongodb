@@ -42,3 +42,4 @@
     - mongodb-org-server-{{mongodb_install_major}}.{{mongodb_install_minor}}.{{mongodb_install_patch}}
     - numactl
     - python-pip
+    - python3-pip

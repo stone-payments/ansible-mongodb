@@ -24,3 +24,4 @@
     - mongodb-org
     - numactl
     - python-pip
+    - python3-pip
