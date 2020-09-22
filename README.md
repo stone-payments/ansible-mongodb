@@ -20,6 +20,7 @@ Therefore, the supported systems list is currently:
   * 7.5
 * Ubuntu
   * 16.04
+  * 18.04
 
 Further distros may be added upon request, as long as the requirements are met.
 
