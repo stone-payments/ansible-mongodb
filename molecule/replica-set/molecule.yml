@@ -3,8 +3,8 @@ dependency:
   name: galaxy
 driver:
   name: docker
-lint:
-  name: yamllint
+lint: |
+  yamllint
 platforms:
   - name: mongo1
     image: centos:7.5.1804
@@ -41,11 +41,11 @@ platforms:
           - mongo3
 provisioner:
   name: ansible
-  lint:
-    name: ansible-lint
+  lint: |
+    ansible-lint
 scenario:
   name: replica-set
 verifier:
   name: testinfra
-  lint:
-    name: flake8
+  lint: |
+    flake8
