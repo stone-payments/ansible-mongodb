@@ -1,0 +1,4 @@
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+
+for server in `cat servers`; do for port in 53 389 636 3268 3269 88 464 9389 135 445; do nc -zv $server $port >/dev/null 2>&1 || echo $server $port; done; done

@@ -17,13 +17,30 @@
     group: root
     mode: "0644"
   with_items:
-    - src: mongod.conf.j2
+    - src: templates/mongod.conf.j2
       dest: "{{ mongodb_conf_file }}"
-    - src: mongod.service.j2
+    - src: templates/mongod.service.j2
       dest: "{{ mongodb_daemon_serviceFile }}"
   notify:
     - systemd reload
     - mongodb restart
+
+- name: Garante as permissões do diretório {{ mongodb_conf_dbPath }} ao usuário/grupo mongod
+  file:
+    path: "{{ mongodb_conf_dbPath }}"
+    owner: mongod
+    group: mongod
+    state: directory
+    recurse: yes
+    mode: 0700
+
+- name: Chcon no diretório    
+  shell:
+    cmd: chcon -R system_u:object_r:mongod_var_lib_t:s0 "{{ mongodb_conf_dbPath }}"
+    
+- name: Chown no diretório    
+  shell:
+    cmd: chown -R mongod:mongod "{{ mongodb_conf_dbPath }}"
 
 - meta: flush_handlers
 

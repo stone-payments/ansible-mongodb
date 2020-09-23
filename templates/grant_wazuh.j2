@@ -1,0 +1,24 @@
+###########################
+## Variáveis
+###########################
+declare -A arrHostAndFolder
+arrHostAndFolder[ {{ hostvars[inventory_hostname] }} ]= {{ mongodb_log_path }} 
+​
+Concessioner_Group_For_Buy4scDomain="BUY4SC\wazuh-svcaccts-log-p"
+Concessioner_Group_For_OtherDomains="RFBUY4\wazuh-svcaccts-log-p"
+###########################
+## Script de permissões
+###########################
+HostFqdn=$(hostname --fqdn)
+HostFqdn=${HostFqdn,,}
+PgLog_DirPath=${arrHostAndFolder[$HostFqdn]}
+if [[ $HostFqdn == *"buy4sc.local"* ]]; then
+  Concessioner_Group="${Concessioner_Group_For_Buy4scDomain}"
+else
+  Concessioner_Group="${Concessioner_Group_For_OtherDomains}"
+fi
+sudo setfacl --recursive --remove-all --set=user::rwX,group::---,other::---,group:"${Concessioner_Group}":r-X,default:user::rwX,default:group:"${Concessioner_Group}":r-X,default:other::--- "${PgLog_DirPath}"
+sudo chmod o+X "${PgLog_DirPath}/.."
+sudo chmod o+X "${PgLog_DirPath}/../.."
+sudo getfacl "${PgLog_DirPath}"
+sudo stat -c "%a %n" "${PgLog_DirPath}/.."

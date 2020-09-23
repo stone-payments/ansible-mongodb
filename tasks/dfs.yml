@@ -1,0 +1,69 @@
+---
+- name: Enviando arquivo de hosts do DFS pra máquina
+  template:
+    src: templates/hosts_dfs.j2
+    dest: "/mnt/servers"
+
+- name: Enviar shell script que testa regras de firewall
+  template:
+    src: templates/testa_regras.j2
+    dest: "/mnt/testa_regras.sh"
+
+- name: Garantindo permissão de execução no shell script
+  file:
+    path: "/mnt/testa_regras.sh"
+    owner: root
+    group: root
+    mode: u=rx,g=x,o=x
+
+- name: Testa a regra de firewall pro DFS
+  shell: /mnt/testa_regras.sh
+  register: saida
+- debug: msg="{{ saida.stdout }}"
+
+- name: Garante que o pacote CIFS-UTILS está instalado
+  yum:
+    name: cifs-utils
+    state: present
+
+- name: Cria o diretório de montagem
+  file:
+    path: "{{ mount_point_dfs }}"
+    state: directory
+    mode: '0755'
+
+- name: Gera o arquivo de credencial para cada ambiente
+  template:
+    src: templates/dfs.j2
+    dest: "/mnt/.user_pass"
+    
+- name: Checa se já está montado
+  command: mountpoint -q {{ mount_point_dfs }}
+  register: verifica
+  #failed_when: True
+  ignore_errors: yes
+
+- debug:
+    msg: "Já tem o mountpoint apontado pro DFS!"
+  when: verifica.rc == 0
+
+- name: Monta o disco apontando pro DFS
+  shell: mount.cifs {{ url_dfs }} {{ mount_point_dfs }} -o credentials=/mnt/.user_pass,vers=3.0,sec=ntlmssp
+  when: verifica.rc == 1
+
+- name: Remove quaisquer resquícios do mountpoint da FSTAB
+  lineinfile:
+    path: /etc/fstab
+    regexp: "cifs"
+    state: absent
+
+- name: Insere o registro na FSTAB para mount automatico pos restart
+  lineinfile:
+    path: /etc/fstab
+    line: "{{ url_dfs }} {{ mount_point_dfs }}       cifs     _netdev,vers=3.0,credentials=/mnt/.user_pass,sec=ntlmssp    0 0"
+    state: present
+
+- name: Estado final dos mountpoints
+  shell: "df -h | grep backup"
+  register: saida
+- debug: msg="{{ saida.stdout_lines }}"

@@ -1,0 +1,14 @@
+[Unit]
+Description=MongoDB Exporter for Prometheus
+
+[Service]
+Type=simple
+Restart=always
+StandardError=syslog
+StandardOutput=syslog
+SyslogIdentifier=mongodb_exporter
+ExecStart=/etc/mongodb_exporter/mongodb_exporter
+Environment="MONGODB_URI=mongodb://{{ mongo_export_user }}:{{ mongo_export_password }}@localhost:27017"
+
+[Install]
+WantedBy=multi-user.target

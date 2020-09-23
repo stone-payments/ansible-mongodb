@@ -10,6 +10,10 @@
   set_fact:
     mongodb_replSet_isMaster: "{{ True if mongodb_replSet_master in ansible_all_ipv4_addresses else False }}"
 
+- name: Habilitando o repositório do Mongo 4.3
+  shell: 
+    cmd: subscription-manager repos --enable=Stone_MongoDB_43_rhel7
+
 - block:
   - name: install MongoDB (RedHat)
     include: install.rpm.yml
@@ -53,3 +57,19 @@
   with_dict: "{{ mongodb_shell_commands }}"
   when: mongodb_shell_run
   tags: mongodb_shell
+
+- name: Dar permissão às contas de serviço do Wazuh para consumir o Log do MongoDB
+  include: grant_wazuh.yml
+  tags: wazuh
+
+- name: Configura a monitoria utilizando o Mongodb_Exporter
+  include: monitoring.yml
+  tags: monitoring
+  
+- name: Monta o DFS
+  include: dfs.yml
+  tags: dfs
+
+- name: Instala e configura o Percona Backup for MongoDB
+  include: pbm.yml
+  tags: pbm

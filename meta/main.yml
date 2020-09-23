@@ -19,4 +19,4 @@ galaxy_info:
   galaxy_tags:
     - database
     - nosql
-dependencies: [ "stone-payments.nohugepages" ]
+#dependencies: [ "stone-payments.nohugepages" ]
