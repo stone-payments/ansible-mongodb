@@ -1,5 +1,5 @@
-docker==4.2.0
-docker-py==1.10.6
+docker
+docker-py
 docker-pycreds==0.4.0
 dockerpty==0.4.1
 ansible==2.9.13

@@ -10,6 +10,7 @@ python:
 before_install:
   - ln -s $TRAVIS_BUILD_DIR $(dirname "$TRAVIS_BUILD_DIR")/$ROLE_NAME
 script:
+  - python -V
   - molecule dependency
   - molecule converge -s default
   - molecule converge -s replica-set
