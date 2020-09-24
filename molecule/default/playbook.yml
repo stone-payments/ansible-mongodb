@@ -2,4 +2,4 @@
 - name: Converge
   hosts: all
   roles:
-    - role: stone-payments.mongodb
+    - stone-payments.mongodb
