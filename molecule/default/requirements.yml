@@ -3,10 +3,6 @@
   src: https://github.com/stone-payments/ansible-nohugepages.git
   scm: git
 
-- name: stone-payments.mongodb
-  src: https://github.com/stone-payments/ansible-mongodb.git
-  scm: git
-
 - name: stone-payments.epel
   src: https://github.com/stone-payments/ansible-epel.git
   scm: git
