@@ -9,7 +9,6 @@ python:
     - "2.7"
     - "3.7"
 before_install:
-  - deactivate
   - pip install docker-py docker
   - ln -s $TRAVIS_BUILD_DIR $(dirname "$TRAVIS_BUILD_DIR")/$ROLE_NAME
   - pip install molecule ansible
