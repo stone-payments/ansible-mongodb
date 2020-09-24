@@ -4,7 +4,8 @@
   scm: git
 
 - name: stone-payments.mongodb
-  src: git+git@github.com:stone-payments/ansible-mongodb.git
+  src: https://github.com/stone-payments/ansible-mongodb.git
+  scm: git
 
 - name: stone-payments.epel
   src: https://github.com/stone-payments/ansible-epel.git
