@@ -1,8 +1,0 @@
-docker
-docker-py
-docker-pycreds
-dockerpty
-ansible==2.9.13
-requests
-yamllint
-molecule
