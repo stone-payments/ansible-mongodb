@@ -15,5 +15,6 @@ before_install:
   - pip install molecule ansible=="2.9.13" docker-py docker
   - molecule dependency
 script:
+  - ansible  --version
   - molecule converge -s default
   - molecule converge -s replica-set
