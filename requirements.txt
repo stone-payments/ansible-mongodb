@@ -1,8 +1,8 @@
 docker
 docker-py
-docker-pycreds==0.4.0
-dockerpty==0.4.1
+docker-pycreds
+dockerpty
 ansible==2.9.13
-requests==2.24.0
-yamllint==1.24.2
-molecule==3.0.8
+requests
+yamllint
+molecule
