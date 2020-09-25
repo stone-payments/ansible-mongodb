@@ -12,7 +12,7 @@ before_install:
   - pip install docker-py
   - source ~/virtualenv/python3.7/bin/activate
   - ln -s $TRAVIS_BUILD_DIR $(dirname "$TRAVIS_BUILD_DIR")/$ROLE_NAME
-  - pip install molecule ansible docker-py docker
+  - pip install molecule ansible=="2.9" docker-py docker
   - molecule dependency
 script:
   - molecule converge -s default
