@@ -8,7 +8,10 @@ language: python
 python:
     - "3.7"
 before_install:
+  - sudo apt-get -qq update
   - ln -s $TRAVIS_BUILD_DIR $(dirname "$TRAVIS_BUILD_DIR")/$ROLE_NAME
+install:
+  - pip install molecule docker docker-py
 script:
   - python -V
   - molecule dependency
