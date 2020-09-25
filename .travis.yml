@@ -10,6 +10,7 @@ python:
 before_install:
   - deactivate
   - ln -s $TRAVIS_BUILD_DIR $(dirname "$TRAVIS_BUILD_DIR")/$ROLE_NAME
+install:
   - pip install pipenv
   - pipenv install
   - pipenv run molecule dependency
