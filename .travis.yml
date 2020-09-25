@@ -7,13 +7,14 @@ services:
 language: python
 python:
     - "2.7"
+    - "3.7"
 before_install:
-  - sudo apt-get -qq update
+  - deactivate
+  - sudo pip install docker-py
+  - activate
   - ln -s $TRAVIS_BUILD_DIR $(dirname "$TRAVIS_BUILD_DIR")/$ROLE_NAME
-install:
-  - pip install molecule docker docker-py
-script:
-  - python -V
+  - pip install molecule ansible
   - molecule dependency
+script:
   - molecule converge -s default
   - molecule converge -s replica-set
