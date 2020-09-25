@@ -9,10 +9,10 @@ python:
   - "3.7"
 before_install:
   - deactivate
-  - pip install docker-py
+  - pip install docker-py docker-py=="3.1.3"
   - source ~/virtualenv/python3.7/bin/activate
   - ln -s $TRAVIS_BUILD_DIR $(dirname "$TRAVIS_BUILD_DIR")/$ROLE_NAME
-  - pip install molecule ansible=="2.9.13" docker-py docker
+  - pip install molecule ansible=="2.9.13" docker-py=="3.1.3"
   - molecule dependency
 script:
   - ansible  --version
