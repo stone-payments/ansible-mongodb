@@ -6,12 +6,11 @@ services:
   - docker
 language: python
 python:
-    - "2.7"
     - "3.7"
 before_install:
   - deactivate
   - sudo pip install docker-py
-  - activate
+  - source ~/virtualenv/python3.7/bin/activate
   - ln -s $TRAVIS_BUILD_DIR $(dirname "$TRAVIS_BUILD_DIR")/$ROLE_NAME
   - pip install molecule ansible
   - molecule dependency
