@@ -10,6 +10,7 @@ ansible = "===2.9.13"
 docker-py = "*"
 requests = "*"
 docker = "*"
+molecule = "*"
 
 [requires]
 python_version = "3.7"
