@@ -9,7 +9,6 @@ verify_ssl = true
 ansible = "===2.9.13"
 docker-py = "*"
 requests = "*"
-docker = "*"
 molecule = "*"
 
 [requires]
