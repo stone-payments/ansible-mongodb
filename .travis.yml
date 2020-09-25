@@ -8,13 +8,9 @@ language: python
 python:
   - "3.7"
 before_install:
-  - deactivate
-  - pip install docker-py docker-py=="3.1.3"
-  - source ~/virtualenv/python3.7/bin/activate
   - ln -s $TRAVIS_BUILD_DIR $(dirname "$TRAVIS_BUILD_DIR")/$ROLE_NAME
-  - pip install molecule ansible=="2.9.13" docker-py=="3.1.3"
-  - molecule dependency
+  - pipenv install
+  - pipenv run molecule dependency
 script:
-  - ansible  --version
-  - molecule converge -s default
-  - molecule converge -s replica-set
+  - pipenv run molecule converge -s default
+  - pipenv run molecule converge -s replica-set
