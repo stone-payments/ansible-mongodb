@@ -5,8 +5,8 @@ driver:
   name: vagrant
   provider:
     name: virtualbox
-lint:
-  name: yamllint
+lint: |
+  yamllint
 platforms:
   - name: centos7-5
     box: bento/centos-7.5
@@ -26,12 +26,12 @@ provisioner:
   name: ansible
   playbooks:
     converge: playbook.yml
-  lint:
-    name: ansible-lint
+  lint: |
+    ansible-lint
 scenario:
   name: security
 verifier:
   name: testinfra
   directory: ../../tests/default
-  lint:
-    name: flake8
+  lint: |
+    flake8

@@ -2,15 +2,19 @@
   pip:
     name: pymongo
     state: latest
-  when:  mongodb_pip_index_url == ""
-    
+  when:
+  - mongodb_pip_index_url == ""
+  - not ansible_check_mode
+
 - name: install pymongo from custom index
   pip:
     name: pymongo
     state: latest
     extra_args: -i "{{ mongodb_pip_index_url }}"
-  when:  mongodb_pip_index_url|default("") != "" 
-  
+  when:
+  - mongodb_pip_index_url|default("") != ""
+  - not ansible_check_mode
+
 - name: remove old broken sysV script
   file:
     path: "/etc/rc.d/init.d/mongod"

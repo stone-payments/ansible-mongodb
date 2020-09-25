@@ -1,17 +1,22 @@
 ---
 env:
   - ROLE_NAME=stone-payments.mongodb
-sudo: required
-services:
-  - docker
+sudo: true
+dist: bionic
 language: python
+python:
+  - "3.7"
 before_install:
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce python3-pip
   - deactivate
-  - sudo pip install docker-py
-  - source ~/virtualenv/python2.7/bin/activate
   - ln -s $TRAVIS_BUILD_DIR $(dirname "$TRAVIS_BUILD_DIR")/$ROLE_NAME
-  - pip install molecule ansible
-  - molecule dependency
+install:
+  - python3 -m pip install install pipenv
+  - pipenv install
+  - pipenv run molecule dependency
 script:
-  - molecule converge -s default
-  - molecule converge -s replica-set
+  - pipenv run molecule converge -s default
+  - pipenv run molecule converge -s replica-set

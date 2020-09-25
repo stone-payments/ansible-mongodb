@@ -14,3 +14,4 @@ Install
 .. code-block:: bash
 
   $ sudo pip install docker-py
+
