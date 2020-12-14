@@ -1,9 +1,33 @@
 ---
-- name: ensure admin login works
+# - name: ensure admin login works
+#   mongodb_user:
+#     database: admin
+#     login_user: "{{ mongodb_admin_user }}"
+#     login_password: "{{ mongodb_admin_password }}"
+#     user: "{{ mongodb_admin_user }}"
+#     password: "{{ mongodb_admin_password }}"
+#     roles:
+#       - db: admin
+#         role: root
+#       - db: local
+#         role: read
+#     state: present
+#   ignore_errors: true
+#   when: mongodb_conf_auth == true
+#   changed_when: false
+#   register: mongodb_login
+
+# - debug: msg="{{ mongodb_login.stdout }}"
+
+# - block:
+- name: enable safeMode
+  include: safeMode.yml
+  vars:
+    - mongodb_safeMode: true
+
+- name: configure mongodb admin user and password
   mongodb_user:
     database: admin
-    login_user: "{{ mongodb_admin_user }}"
-    login_password: "{{ mongodb_admin_password }}"
     user: "{{ mongodb_admin_user }}"
     password: "{{ mongodb_admin_password }}"
     roles:
@@ -12,31 +36,19 @@
       - db: local
         role: read
     state: present
-  ignore_errors: true
-  when: mongodb_conf_auth == true
-  changed_when: false
-  register: mongodb_login
 
-- block:
-  - name: enable safeMode
-    include: safeMode.yml
-    vars:
-      - mongodb_safeMode: true
+- name: Copiando script de criação do usuário do PBM
+  template:
+    src: templates/pbm_user.j2
+    dest: "/root/pbm_user.js"
+    owner: root
+    group: root
 
-  - name: configure mongodb admin user and password
-    mongodb_user:
-      database: admin
-      user: "{{ mongodb_admin_user }}"
-      password: "{{ mongodb_admin_password }}"
-      roles:
-        - db: admin
-          role: root
-        - db: local
-          role: read
-      state: present
+- name: Executar o script de criação do usuário
+  shell: mongo /root/pbm_user.js
 
-  - name: disable safeMode
-    include: safeMode.yml
-    vars:
-      - mongodb_safeMode: false
-  when: mongodb_login is failed
+- name: disable safeMode
+  include: safeMode.yml
+  vars:
+    - mongodb_safeMode: false
+#when: mongodb_login is failed

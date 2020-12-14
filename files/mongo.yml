@@ -1,0 +1,5 @@
+logs:
+  - name: Backup Mongo
+    file: /var/log/mongo-backups/*.log
+    attributes:
+      application: mongodb

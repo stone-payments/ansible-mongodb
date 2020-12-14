@@ -2,8 +2,8 @@
 - name: ensure mongo from EPEL is not installed
   yum:
     name:
-      - mongodb
-      - mongodb-server
+      - mongodb-org-server-4.4.1-1
+      - mongodb-org-4.4.1-1
       - python-pymongo
     state: absent
 
@@ -40,5 +40,6 @@
   with_items:
     - mongodb-org-{{mongodb_install_major}}.{{mongodb_install_minor}}.{{mongodb_install_patch}}
     - mongodb-org-server-{{mongodb_install_major}}.{{mongodb_install_minor}}.{{mongodb_install_patch}}
+    - mongodb-org-tools-{{mongodb_install_major}}.{{mongodb_install_minor}}.{{mongodb_install_patch}}
     - numactl
     - python-pip

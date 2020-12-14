@@ -1,0 +1,48 @@
+---
+- name: Cria o usuário de monitoria para o Mongo_Exporter
+  mongodb_user:
+    login_user: "{{ mongodb_admin_user }}"
+    login_password: "{{ mongodb_admin_password }}"
+    database: admin
+    user: "{{ mongo_export_user }}"
+    password: "{{ mongo_export_password }}"
+    roles:
+      - db: admin
+        role: clusterMonitor
+      - db: local
+        role: read
+    state: present
+  tags: monitoring
+  ignore_errors: yes
+
+- name: Cria o diretório aonde ficará o binário do Mongo_Exporter
+  file:
+    path: /etc/mongodb_exporter
+    state: directory
+    mode: '0755'
+  tags: monitoring
+
+- name: Baixa o instalador do Mongo_Exporter
+  shell: wget https://github.com/percona/mongodb_exporter/releases/download/v0.11.0/mongodb_exporter-0.11.0.linux-amd64.tar.gz 
+  args:
+    chdir: /etc/mongodb_exporter
+  tags: monitoring
+
+- name: Extrair o binário do Mongo_Exporter
+  shell: tar -xvf mongodb_exporter-0.11.0.linux-amd64.tar.gz
+  args:
+    chdir: /etc/mongodb_exporter
+  tags: monitoring
+
+- name: Criando o serviço no SO
+  template:
+    src: templates/mongodb_exporter.j2
+    dest: "/etc/systemd/system/mongodb_exporter.service"
+  tags: monitoring
+
+- name: Habilita e inicia o serviço do Mongo_Exporter
+  service:
+    name: mongodb_exporter
+    state: started
+    enabled: true
+  tags: monitoring

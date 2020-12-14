@@ -2,26 +2,39 @@
 # {{ ansible_managed }}
 [Unit]
 Description=MongoDB Database Service
-Wants=network.target nohugepages.service
+Documentation=https://docs.mongodb.org/manual
 After=network.target
 
 [Service]
-Type=simple
-RuntimeDirectory=mongod
-PIDFile={{ mongodb_conf_pidFile }}
-ExecStart={{ mongodb_daemon_bin }} --config {{ mongodb_conf_file }}
-ExecReload=/bin/kill -HUP $MAINPID
-Restart=always
-User={{ mongodb_daemon_user }}
-Group={{ mongodb_daemon_group }}
-StandardOutput=journal
-StandardError=journal
+
+User=mongod
+Group=mongod
+Environment="OPTIONS=-f {{ mongodb_conf_file }}"
+EnvironmentFile=-/etc/sysconfig/mongod
+ExecStart=/usr/bin/mongod $OPTIONS
+ExecStartPre=/usr/bin/mkdir -p /var/run/mongodb
+ExecStartPre=/usr/bin/chown mongod:mongod /var/run/mongodb
+ExecStartPre=/usr/bin/chmod 0755 /var/run/mongodb
+PermissionsStartOnly=true
+PIDFile=/var/run/mongodb/mongod.pid
+Type=forking
+# file size
 LimitFSIZE=infinity
+# cpu time
 LimitCPU=infinity
+# virtual memory size
 LimitAS=infinity
+# open files
 LimitNOFILE=64000
+# processes/threads
 LimitNPROC=64000
+# locked memory
+LimitMEMLOCK=infinity
+# total threads (user+kernel)
+TasksMax=infinity
+TasksAccounting=false
+# Recommended limits for mongod as specified in
+# https://docs.mongodb.com/manual/reference/ulimit/#recommended-ulimit-settings
 
 [Install]
 WantedBy=multi-user.target
-Alias=mongo.service mongodb.service mongodb-server.service mongodb-org.service mongodb-org-server.service

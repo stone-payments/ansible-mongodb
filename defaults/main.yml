@@ -8,22 +8,31 @@ mongodb_install_minor: 6
 mongodb_install_patch: "*"
 
 mongodb_daemon_bin: /usr/bin/mongod
-mongodb_daemon_serviceFile: /etc/systemd/system/mongod.service
 mongodb_daemon_user: mongod
 mongodb_daemon_group: mongod
 
+mongodb_replSet_key: "ChaveReplicaSet" #optional, cross-replica authentication key
+mongodb_daemon_serviceFile: /usr/lib/systemd/system/mongod.service
+mongodb_conf_logging:
+  verbosity: 0
+  logAppend: true
+  verbosity: 5
+  destination: file
+  path: "{{ mongodb_log_path }}/mongod.log"
+mongodb_conf_auth: true
+mongodb_replSet_enabled: true
+    
+
+
 mongodb_conf_file: /etc/mongodb/mongod.conf            # Configuration file path
-mongodb_conf_pidFile: /var/run/mongod/mongod.pid       # PID file path
+mongodb_conf_pidFile: /var/run/mongodb/mongod.pid       # PID file path
 mongodb_conf_dbPath: /var/lib/mongo                    # Directory for datafiles
 mongodb_conf_dbEngine: wiredTiger                      # Storage Engine
-mongodb_conf_auth: false                               # Client authentication
-mongodb_conf_bindIp: "127.0.0.1"                       # Comma separated list of ip addresses to listen on
+mongodb_conf_bindIp: "0.0.0.0"                       # Comma separated list of ip addresses to listen on
 mongodb_conf_cpu: yes                                  # Periodically show cpu and iowait utilization
 mongodb_conf_httpInterface: false                      # Enable (deprecated) http interface
 mongodb_conf_ipv6: false                               # Enable IPv6 support
 mongodb_conf_journal: true                             # Enable journaling
-mongodb_conf_logging:                                  # systemLog settings dictionary
-  verbosity: 0
 mongodb_conf_maxConns: 800                             # Max number of simultaneous connections
 mongodb_conf_port: 27017                               # Specify TCP port number
 mongodb_conf_oplogSize: 1024
@@ -31,13 +40,11 @@ mongodb_conf_oplogSize: 1024
 mongodb_admin_user: "admin"
 mongodb_admin_password: "adminPassword"
 
-mongodb_replSet_enabled: false
 mongodb_replSet_name: ""
 mongodb_replSet_master: "127.0.0.1"
 mongodb_replSet_member: "{{ ansible_default_ipv4.address }}"
 mongodb_replSet_votes: 1
 mongodb_replSet_arbiter: false
-mongodb_replSet_key: ""                                # Keyfile content
 mongodb_replSet_keyFile: /etc/mongodb/mongod.key       # Keyfile path
 
 mongodb_shell_run: false
@@ -49,3 +56,5 @@ mongodb_shell_commands: {}                             # Define mongo shell comm
 mongodb_safeMode: false
 mongodb_enable_yum_repository: true
 mongodb_pip_index_url: ""
+mongodb_replicaset_members: "{{ groups['mongo'] | map('extract', hostvars, ['ansible_host']) | list }}"
+wazuh_log: "{{ mongodb_log_path }}"  

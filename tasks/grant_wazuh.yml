@@ -1,0 +1,17 @@
+---
+- name: Copia o shell script de grants do Wazuh para a máquina
+  template:
+    src: templates/grant_wazuh.j2
+    dest: "/root/grant_wazuh.sh"
+    owner: root
+    group: root
+    mode: 777
+  tags: wazuh
+
+- name: Garante permissão de execução no Script
+  shell: chmod a+x /root/grant_wazuh.sh
+  tags: wazuh
+
+- name: Executa script de grant do Wazuh no diretório de log
+  shell: "/root/grant_wazuh.sh"
+  tags: wazuh

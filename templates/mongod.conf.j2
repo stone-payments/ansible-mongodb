@@ -2,7 +2,7 @@
 # {{ ansible_managed }}
 
 net:
-  bindIp: {{ '127.0.0.1' if mongodb_safeMode else mongodb_conf_bindIp }}
+  bindIp: 0.0.0.0
 {% if mongodb_install_major <= 3 and mongodb_install_minor < 6 %}
   http:
     enabled: {{ mongodb_conf_httpInterface|to_nice_json|bool|lower }}
@@ -12,7 +12,7 @@ net:
   port: {{ mongodb_conf_port|int }}
 
 processManagement:
-  fork: false
+  fork: true
   pidFilePath: {{ mongodb_conf_pidFile }}
 
 {% if mongodb_replSet_enabled and not mongodb_safeMode %}
@@ -35,7 +35,7 @@ security:
 {% endif %}
 
 storage:
-  dbPath: {{ mongodb_conf_dbPath }}
+  dbPath: "{{ mongodb_conf_dbPath }}"
   engine: {{ mongodb_conf_dbEngine }}
   journal:
     enabled: {{ mongodb_conf_journal|to_nice_json|bool|lower }}

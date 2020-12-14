@@ -1,0 +1,50 @@
+---
+- name: Instala o repositório da Percona
+  yum_repository:
+    name: Percona-Release yum_repository
+    description: Repositório da percona para instalação das ferramentas
+    baseurl: yum install https://repo.percona.com/yum/percona-release-latest.noarch.rpm -y
+
+- name: Habilita o repositório do PBM
+  become: yes
+  shell: percona-release enable pbm release
+
+- name: Instala o pacote do Percona Backup for MongoDB
+  yum:
+    name: percona-backup-mongodb
+    state: latest
+
+- name: Copia o arquivo de configuração do serviço do pbm-agent
+  template:
+    src: templates/pbm-env.j2
+    dest: "/etc/default/pbm-agent"
+    owner: pbm
+    group: pbm
+
+- name: Habilita e inicia o serviço do PBM
+  service:
+    name: pbm-agent
+    state: started
+    enabled: true
+
+- name: Copia o arquivo de configuração do pbm
+  template:
+    src: templates/pbm_config.j2
+    dest: "/root/pbm_config.yml"
+    owner: root
+    group: root   
+
+- name: Cadastra a variável de ambiente do pbm no usuário root
+  lineinfile:
+    path: /root/.bash_profile
+    line: 'export PBM_MONGODB_URI="mongodb://{{ pbm_user }}:{{ pbm_pass }}@localhost:27017"'
+    state: present
+    
+- name: Aplica o arquivo de configuração
+  shell: pbm config --file /root/pbm_config.yml
+
+- name: Testa o PBM
+  shell: pbm list
+  register: pbm_var
+
+- debug: msg={{ pbm_var }}

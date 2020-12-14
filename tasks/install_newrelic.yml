@@ -1,0 +1,7 @@
+- name: Install newrelic-infra
+  yum:
+    name: newrelic-infra
+    state: present
+
+- name: Restart service
+  shell: service newrelic-infra restart

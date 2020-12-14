@@ -1,0 +1,6 @@
+license_key: 7e524696c1cf41f83ec7723a2e86cc4e069dNRAL
+log_file: /var/log/newrelic-infra/newrelic-infra.log
+#proxy: http://webproxy.dc2.buy4.io:80 # Proxy de Chicago
+#proxy: http://172.17.122.132:5800     # Proxy de ServerCentral
+#proxy: http://webproxy.apps.buy4.io:80# Proxy de Atlanta
+#proxy: http://172.18.122.142:5800     # Proxy de TierPoint
