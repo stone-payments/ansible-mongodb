@@ -1,0 +1,4 @@
+- name: Clean cache yum
+  shell: "{{ item }}"
+  with_items:
+    - sudo yum -q makecache -y --disablerepo='*' --enablerepo='newrelic-infra'

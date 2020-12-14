@@ -1,0 +1,29 @@
+- name: Copy repo newrelic-infra
+  copy:
+    src: "{{ item }}"
+    dest: /etc/yum.repos.d/
+    owner: root
+    group: root
+    mode: 644
+  with_items:
+    - files/newrelic-infra.repo
+
+- name: Copy repo newrelic-infra.yml
+  copy:
+    src: "{{ item }}"
+    dest: /etc/
+    owner: root
+    group: root
+    mode: 755
+  with_items:
+    - files/newrelic-infra.yml
+
+- name: Copy mongo_backup
+  copy:
+    src: "{{ item }}"
+    dest: /etc/newrelic-infra/logging.d/
+    owner: root
+    group: root
+    mode: 644
+  with_items:
+    - files/mongo.yml

@@ -1,0 +1,10 @@
+---
+- name: NewRelic-Infra
+  hosts: DB
+  gather_facts: false
+  become: yes
+
+  tasks:
+      - include: tasks/copy_files.yml
+      - include: tasks/yum_clean_cache.yml
+      - include: tasks/install_newrelic.yml
